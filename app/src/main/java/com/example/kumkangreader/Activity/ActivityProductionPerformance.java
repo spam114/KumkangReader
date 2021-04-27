@@ -1,21 +1,38 @@
 package com.example.kumkangreader.Activity;
 
+import android.content.ContentValues;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.example.kumkangreader.Adapter.InputAdapter;
+import com.example.kumkangreader.Object.InputData;
+import com.example.kumkangreader.Object.OutputData;
 import com.example.kumkangreader.Object.ProductionInfo;
 import com.example.kumkangreader.R;
+import com.example.kumkangreader.RequestHttpURLConnection;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 
 public class ActivityProductionPerformance extends BaseActivity{
     ArrayList<ProductionInfo> productionInfoArrayList;
+    ArrayList<InputData> inputDataArrayList;
+    ArrayList<OutputData> outputDataArrayList;
+    InputAdapter inputAdapter;//투입 어뎁터
     TextView txtInputTotal;
     TextView txtOutputTotal;
     TextView txtWorksOrderNo;
     String worksOrderNo;
+    String costCenter;
     String costCenterName;
+    ListView listViewInput;
+    ListView listViewOutput;
 
     public void startProgress() {
 
@@ -36,17 +53,28 @@ public class ActivityProductionPerformance extends BaseActivity{
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production_performance);
         this.productionInfoArrayList= (ArrayList<ProductionInfo>) getIntent().getSerializableExtra("productionInfoArrayList");
+        this.inputDataArrayList=new ArrayList<>();
+        this.outputDataArrayList=new ArrayList<>();
+        this.listViewInput= findViewById(R.id.listViewInput);
+        this.listViewOutput=findViewById(R.id.listViewOutPut);
         this.worksOrderNo =  getIntent().getStringExtra("worksOrderNo");
+        this.costCenter =  getIntent().getStringExtra("costCenter");
         this.costCenterName =  getIntent().getStringExtra("costCenterName");
         this.txtInputTotal=findViewById(R.id.txtInputTotal);
         this.txtOutputTotal=findViewById(R.id.txtOutputTotal);
         this.txtWorksOrderNo=findViewById(R.id.txtWorksOrderNo);
         this.txtWorksOrderNo.setText(worksOrderNo+" / "+costCenterName);
         this.txtInputTotal.setText("투입: "+String.format("%.0f",Double.parseDouble(this.productionInfoArrayList.get(0).InputQty)));
-        this.txtOutputTotal.setText(", 생산: "+String.format("%.0f",Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutPutQty))+" / "
-                +String.format("%.0f",Double.parseDouble(this.productionInfoArrayList.get(0).OutPutQty)));
+        this.txtOutputTotal.setText(", 생산: "+String.format("%.0f",Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty))+" / "
+                +String.format("%.0f",Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
 
-        //출고
+
+        getInputData();//투입정보 가져오기
+        //getOutputData();//생산정보 가져오기
+
+
+
+       //출고
 
         //생산실적 셋팅
 
@@ -83,6 +111,89 @@ public class ActivityProductionPerformance extends BaseActivity{
         registerReceiver();*/
 
     }
+
+    private void getInputData(){
+        String url=getString(R.string.service_address) + "getInputData";
+        ContentValues values = new ContentValues();
+        values.put("WorksOrderNo", worksOrderNo);
+        values.put("CostCenter", costCenter);
+        GetInputData gsod = new GetInputData(url, values);
+        gsod.execute();
+    }
+
+
+  /*  private void getOutputData(){
+        String url=getString(R.string.service_address) + "getOutputData";
+        ContentValues values = new ContentValues();
+        values.put("WorksOrderNo", worksOrderNo);
+        values.put("CostCenter", costCenter);
+        GetOutputData gsod = new GetOutputData(url, values);
+        gsod.execute();
+    }*/
+
+
+    public class GetInputData extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        GetInputData(String url, ContentValues values){
+            this.url = url;
+            this.values = values;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                InputData inputData;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                inputDataArrayList=new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    inputData = new InputData(
+                            child.getString("ItemTag"),
+                            child.getString("CoilNo"),
+                            child.getString("PartCode"),
+                            child.getString("PartName"),
+                            child.getString("PartSpec"),
+                            child.getString("PartSpecName"),
+                            child.getString("Qty"),
+                            child.getString("UseFlag")
+                    );
+                    inputDataArrayList.add(inputData);
+                    inputAdapter=new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList);
+                    listViewInput.setAdapter(inputAdapter);
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                progressOFF();
+            }
+
+        }
+    }
+
 
     private void Scannerinitialize(){
         /*mSavedStatus = mCurrentStatus = STATUS_CLOSE;

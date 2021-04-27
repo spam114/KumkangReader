@@ -292,6 +292,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
             try {
                 String worksOrderNo;
+                String costCenter;
                 String costCenterName;
 
                 ProductionInfo productionInfo;
@@ -306,16 +307,17 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                         return;
                     }
                     productionInfo = new ProductionInfo(
-                            child.getString("OutPutQty"),
+                            child.getString("OutputQty"),
                             child.getString("CostCenter"),
                             child.getString("CostCenterName"),
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
-                            child.getString("IssueOutPutQty"));
+                            child.getString("IssueOutputQty"));
 
                     productionInfoArrayList.add(productionInfo);
                 }
                 worksOrderNo=productionInfoArrayList.get(0).WorksOrderNo;
+                costCenter=productionInfoArrayList.get(0).CostCenter;
                 costCenterName=productionInfoArrayList.get(0).CostCenterName;
                 /*int totalQty = 0;
                 int totalScanQty = 0;
@@ -327,6 +329,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 Intent i = new Intent(getBaseContext(), ActivityProductionPerformance.class);
                 i.putExtra("productionInfoArrayList", productionInfoArrayList);
                 i.putExtra("worksOrderNo",worksOrderNo);
+                i.putExtra("costCenter",costCenter);
                 i.putExtra("costCenterName",costCenterName);
                 startActivityForResult(i, REQUEST_PRODUCTION);
 

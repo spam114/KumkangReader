@@ -136,7 +136,7 @@
                 android:id="@+id/txtCoil"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="6"
+                android:layout_weight="5.5"
                 android:gravity="center"
                 android:text="TAG/코일 번호"
                 android:textColor="#FFFFFF" />
@@ -145,7 +145,7 @@
                 android:id="@+id/txtPart"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="6"
+                android:layout_weight="5.5"
                 android:gravity="center"
                 android:text="품명/규격"
                 android:textColor="#FFFFFF" />
@@ -154,9 +154,18 @@
                 android:id="@+id/txtQty"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="3"
+                android:layout_weight="2.5"
                 android:gravity="center"
                 android:text="수량"
+                android:textColor="#FFFFFF" />
+
+            <TextView
+                android:id="@+id/txtUseFlag"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:text="실적"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>
