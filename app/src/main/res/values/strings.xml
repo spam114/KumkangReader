@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">QR코드시스템(언양)</string>
+    <string name="qr_state_stockoutmaster">상차태그를 인식해주세요.</string>
+    <string name="qr_state_coil_input">코일태그를 인식해주세요.</string>
+    <string name="qr_state_production">발주서태그를 인식해주세요.</string>
+   <!-- <string name="service_address">http://211.245.239.53:2222/Service/json/</string>-->
+    <string name="service_address">http://211.245.239.53:3333/Service/json/</string>
+    <string name="app_code">4</string>
+</resources>

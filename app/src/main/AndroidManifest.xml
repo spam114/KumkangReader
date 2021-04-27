@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.kumkangreader">
+
+    <!--인터넷-->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /><!--오레오 버전 부터 추가된  설치 권한-->
+    <uses-permission android:name="android.permission.BLUETOOTH"/><!--핸드폰정보 이름 설정값을 알아오기위한 블루투스 권한-->
+    <application
+        android:name="com.example.kumkangreader.Application.ApplicationClass"
+        android:allowBackup="true"
+        android:icon="@drawable/logo2"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:largeHeap="true"
+        android:hardwareAccelerated="true"
+        >
+        <activity
+            android:name=".Activity.SplashScreenActivity"
+            tools:ignore="LockedOrientationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name=".MainActivity"
+            tools:ignore="LockedOrientationActivity"
+            >
+        </activity>
+        <activity android:name="com.example.kumkangreader.QRCode.QRReaderActivityStockOutMaster"
+            tools:ignore="LockedOrientationActivity"
+            />
+        <activity android:name="com.example.kumkangreader.Activity.ActivityStockOut"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <activity android:name="com.example.kumkangreader.Activity.LoginActivity"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <activity android:name="com.example.kumkangreader.Activity.RegisterActivity"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <activity android:name="com.example.kumkangreader.MainActivity2"
+            tools:ignore="LockedOrientationActivity"
+            />
+        <activity android:name=".Activity.ActivityProductionPerformance"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.provider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/provider_paths"/>
+        </provider>
+
+        <!--<receiver
+
+            android:name=".Receiver.StartupReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
+            </intent-filter>
+        </receiver>-->
+    </application>
+</manifest>
