@@ -13,12 +13,12 @@ import android.widget.TextView;
 
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
-import com.example.kumkangreader.Object.InputData;
+import com.example.kumkangreader.Object.OutputData;
 import com.example.kumkangreader.R;
 
 import java.util.ArrayList;
 
-public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivityInterface {
+public class OutputAdapter extends ArrayAdapter<OutputData> implements BaseActivityInterface {
 
     Context context;
     int layoutRsourceId;
@@ -28,8 +28,7 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
     //int adapterType;//0번instruction(지시어뎁터), 1번스캔(input어뎁터)
 
 
-
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data) {
+    public OutputAdapter(Context context, int layoutResourceID, ArrayList data) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
@@ -38,7 +37,7 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
         //this.stockOutNo = stockOutNo;
     }
 
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart) {
+    public OutputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
@@ -58,33 +57,24 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             row = inflater.inflate(layoutRsourceId, null);
         }
 
-        final InputData item = (InputData) data.get(position);
+        final OutputData item = (OutputData) data.get(position);
         if (item != null) {
 
             TextView txtItemTag = (TextView) row.findViewById(R.id.txtItemTag);
-            txtItemTag.setText(((InputData) data.get(position)).ItemTag.replace("EI-",""));
+            txtItemTag.setText(((OutputData) data.get(position)).ItemTag.replace("EI-",""));
 
             TextView txtCoil = (TextView) row.findViewById(R.id.txtCoil);
-            txtCoil.setText(((InputData) data.get(position)).CoilNo);
+            txtCoil.setText(((OutputData) data.get(position)).CoilNo);
 
             TextView txtPartName = (TextView) row.findViewById(R.id.txtPartName);
-            txtPartName.setText(((InputData) data.get(position)).PartName);
+            txtPartName.setText(((OutputData) data.get(position)).PartName);
 
             TextView txtPartSpec = (TextView) row.findViewById(R.id.txtPartSpec);
-            txtPartSpec.setText(((InputData) data.get(position)).PartSpec);
+            txtPartSpec.setText(((OutputData) data.get(position)).PartSpec);
 
             TextView txtQty = (TextView) row.findViewById(R.id.txtQty);
-            String qty=String.format("%.0f",Double.parseDouble(((InputData) data.get(position)).Qty));
+            String qty=String.format("%.0f",Double.parseDouble(((OutputData) data.get(position)).Qty));
             txtQty.setText(qty);
-
-            TextView txtUseFlag = (TextView) row.findViewById(R.id.txtUseFlag);
-            String useFlag="";
-            if(((InputData) data.get(position)).UseFlag.equals("0")){
-                useFlag = "N";
-            } else {
-                useFlag = "Y";
-            }
-            txtUseFlag.setText(useFlag);
 
             LinearLayout detailLayout = row.findViewById(R.id.detailLayout);
 
@@ -93,6 +83,16 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
 
                 this.lastPosition = position;
             }
+
+            //LinearLayout layoutQty=row.findViewById(R.id.layoutQty);
+
+            /*if ((item.PartCode + "-" + item.PartSpec).equals(lastPart)) {//마지막 변경된 행 강조표시
+                textViewPartName.setBackgroundColor(Color.YELLOW);
+                textViewPartSpecName.setBackgroundColor(Color.YELLOW);
+                layoutQty.setBackgroundColor(Color.YELLOW);
+
+                this.lastPosition = position;
+            }*/
 
             /*row.setOnClickListener(new View.OnClickListener() {
                 @Override

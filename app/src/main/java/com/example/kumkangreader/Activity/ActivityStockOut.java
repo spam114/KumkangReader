@@ -283,7 +283,7 @@ public class ActivityStockOut extends BaseActivity{
         switch (v.getId()) {
             case R.id.btnCamera:
                 IntentIntegrator intentIntegrator = new IntentIntegrator(this);
-                intentIntegrator.setBeepEnabled(false);//바코드 인식시 소리
+                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
                 // intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
                 intentIntegrator.setPrompt("제품 QR코드를 인식하여 주세요.");
                 intentIntegrator.initiateScan();

@@ -204,7 +204,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             @Override
             public void onClick(View v) {
                 IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity2.this);
-                intentIntegrator.setBeepEnabled(false);//바코드 인식시 소리
+                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
                 if(firstTab.isSelected()){//코일입고
                     //intentIntegrator.(MAIN_COIL_INPUT);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_coil_input));
@@ -294,6 +294,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 String worksOrderNo;
                 String costCenter;
                 String costCenterName;
+                String locationNo;
 
                 ProductionInfo productionInfo;
                 JSONArray jsonArray = new JSONArray(result);
@@ -312,13 +313,16 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                             child.getString("CostCenterName"),
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
-                            child.getString("IssueOutputQty"));
+                            child.getString("IssueOutputQty"),
+                            child.getString("LocationNo")
+                    );
 
                     productionInfoArrayList.add(productionInfo);
                 }
                 worksOrderNo=productionInfoArrayList.get(0).WorksOrderNo;
                 costCenter=productionInfoArrayList.get(0).CostCenter;
                 costCenterName=productionInfoArrayList.get(0).CostCenterName;
+                locationNo=productionInfoArrayList.get(0).LocationNo;
                 /*int totalQty = 0;
                 int totalScanQty = 0;
                 for (int j = 0; j < stockOutDetailArrayList.size(); j++) {
@@ -331,6 +335,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 i.putExtra("worksOrderNo",worksOrderNo);
                 i.putExtra("costCenter",costCenter);
                 i.putExtra("costCenterName",costCenterName);
+                i.putExtra("locationNo", locationNo);
                 startActivityForResult(i, REQUEST_PRODUCTION);
 
             } catch (Exception e) {

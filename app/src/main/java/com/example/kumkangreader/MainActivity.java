@@ -300,7 +300,7 @@ public class MainActivity extends BaseActivity {
         switch (v.getId()) {
             case R.id.btnCamera:
                 IntentIntegrator intentIntegrator = new IntentIntegrator(this);
-                intentIntegrator.setBeepEnabled(false);//바코드 인식시 소리
+                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
                 // intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
                 intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
                 intentIntegrator.initiateScan();
