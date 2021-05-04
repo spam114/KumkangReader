@@ -244,16 +244,20 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     Toast.makeText(this, scanResult,Toast.LENGTH_LONG).show();//Test 용
                 }
                 else if(secondTab.isSelected()) {//생산실적
-                    String[] array=scanResult.split("/");
-                    String worksOrderNo=array[0];
-                    String costCenter = array[1];
-                    String url=getString(R.string.service_address) + "getProductionBasicInfo";
-                    ContentValues values = new ContentValues();
-                    values.put("WorksOrderNo", worksOrderNo);
-                    values.put("CostCenter", costCenter);
-                    GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values);
-                    gsod.execute();
-
+                    try {
+                        String[] array = scanResult.split("/");
+                        String worksOrderNo = array[0];
+                        String costCenter = array[1];
+                        String url = getString(R.string.service_address) + "getProductionBasicInfo";
+                        ContentValues values = new ContentValues();
+                        values.put("WorksOrderNo", worksOrderNo);
+                        values.put("CostCenter", costCenter);
+                        GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values);
+                        gsod.execute();
+                    }
+                    catch (ArrayIndexOutOfBoundsException aoe){
+                        Toast.makeText(this, "올바른 발주서 태그가 아닙니다.", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else {//출고등록
                     fragmentStockOut.callGetStockOutMaster(scanResult);

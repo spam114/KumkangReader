@@ -77,14 +77,15 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             String qty=String.format("%.0f",Double.parseDouble(((InputData) data.get(position)).Qty));
             txtQty.setText(qty);
 
-            TextView txtUseFlag = (TextView) row.findViewById(R.id.txtUseFlag);
+            //TextView txtUseFlag = (TextView) row.findViewById(R.id.txtUseFlag);
             String useFlag="";
             if(((InputData) data.get(position)).UseFlag.equals("0")){
-                useFlag = "N";
+                //useFlag = "N";
+                txtQty.setTextColor(Color.RED);
             } else {
-                useFlag = "Y";
+                txtQty.setTextColor(Color.parseColor("#757575"));
+               // useFlag = "Y";
             }
-            txtUseFlag.setText(useFlag);
 
             LinearLayout detailLayout = row.findViewById(R.id.detailLayout);
 
@@ -93,6 +94,8 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
 
                 this.lastPosition = position;
             }
+
+
 
             /*row.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -107,6 +110,19 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
                 }
             });*/
         }
+
+        row.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                //ScrapDeleteDialog sdd = new ScrapDeleteDialog(context);
+                //sdd.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
+                //sdd.show();
+
+
+                return true;
+            }
+        });
         return row;
     }
 
