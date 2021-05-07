@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Message;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.ListView;
@@ -34,6 +35,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     InputAdapter inputAdapter;//투입 어뎁터
     OutputAdapter outputAdapter;//실적 어뎁터
     TextView txtInputTotal;
+    TextView txtScrappedQty;
     TextView txtOutputTotal;
     TextView txtWorksOrderNo;
     String worksOrderNo;
@@ -78,6 +80,10 @@ public class ActivityProductionPerformance extends BaseActivity {
         this.txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).InputQty)));
         this.txtOutputTotal.setText(",   생산: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty)) + " / "
                 + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
+        this.txtScrappedQty=findViewById(R.id.txtScrappedQty);
+        this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
+
+
         this.imvQR = findViewById(R.id.imvQR);
         getInputData("","");//투입정보 가져오기
 
@@ -150,7 +156,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     }
 
 
-    private void getInputData(String itemTag, String itemTag2) {
+    public void getInputData(String itemTag, String itemTag2) {
         String url = getString(R.string.service_address) + "getInputData";
         ContentValues values = new ContentValues();
         values.put("WorksOrderNo", worksOrderNo);
@@ -180,15 +186,6 @@ public class ActivityProductionPerformance extends BaseActivity {
         JudgeInputOutput gsod = new JudgeInputOutput(url, values);
         gsod.execute();
     }
-
-  /*  private void getOutputData(){
-        String url=getString(R.string.service_address) + "getOutputData";
-        ContentValues values = new ContentValues();
-        values.put("WorksOrderNo", worksOrderNo);
-        values.put("CostCenter", costCenter);
-        GetOutputData gsod = new GetOutputData(url, values);
-        gsod.execute();
-    }*/
 
 
     public class GetInputData extends AsyncTask<Void, Void, String> {
@@ -243,6 +240,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("PartName"),
                             child.getString("PartSpec"),
                             child.getString("PartSpecName"),
+                            child.getString("MSpec"),
                             child.getString("Qty"),
                             child.getString("UseFlag")
                     );
@@ -250,9 +248,9 @@ public class ActivityProductionPerformance extends BaseActivity {
                 }
 
                 if(this.itemTag.equals(""))
-                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList);
+                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, costCenter, mHandler);
                 else{
-                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, this.itemTag);
+                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, this.itemTag, costCenter, mHandler);
                 }
                 getOutputData(itemTag2);//생산정보 가져오기
                 listViewInput.setAdapter(inputAdapter);
@@ -319,15 +317,16 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("PartName"),
                             child.getString("PartSpec"),
                             child.getString("PartSpecName"),
+                            child.getString("MSpec"),
                             child.getString("Qty")
                     );
                     outputDataArrayList.add(outputData);
 
                 }
                 if(this.itemTag.equals(""))
-                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList);
+                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, costCenter, mHandler);
                 else
-                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag);
+                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag, costCenter, mHandler);
                 listViewOutput.setAdapter(outputAdapter);
                 listViewOutput.setSelection(outputAdapter.lastPosition);
                 getProductionBasicInfo();
@@ -341,6 +340,18 @@ public class ActivityProductionPerformance extends BaseActivity {
 
         }
     }
+
+    /**
+     * 생산실적, 투입 삭제후
+     */
+    public Handler mHandler = new Handler() { //다이얼로그 종료시 액티비티 데이터 전송을 위함
+        @Override
+        public void handleMessage(Message msg) {
+            getInputData("","");
+
+        }
+    };
+
 
     private void getProductionBasicInfo(){
         String url=getString(R.string.service_address) + "getProductionBasicInfo";
@@ -399,7 +410,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
                             child.getString("IssueOutputQty"),
-                            child.getString("LocationNo")
+                            child.getString("LocationNo"),
+                            child.getString("ScrappedQty")
                     );
 
                     productionInfoArrayList.add(productionInfo);
@@ -411,6 +423,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).InputQty)));
                 txtOutputTotal.setText(",   생산: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).IssueOutputQty)) + " / "
                         + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).OutputQty)));
+                txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).ScrappedQty)));
 
             } catch (Exception e) {
                 e.printStackTrace();

@@ -56,6 +56,14 @@
             tools:ignore="LockedOrientationActivity"
             />
 
+        <activity android:name=".Activity.Activity_test"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <activity android:name=".Activity.ActivityScrap"
+            tools:ignore="LockedOrientationActivity"
+            />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

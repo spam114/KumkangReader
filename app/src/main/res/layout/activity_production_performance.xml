@@ -75,6 +75,13 @@
                                 android:layout_height="wrap_content"
                                 android:text="총생산" />
                         </LinearLayout>
+
+                        <TextView
+                            android:id="@+id/txtScrappedQty"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="불량수량" />
+
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
             </LinearLayout>

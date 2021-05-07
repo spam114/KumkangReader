@@ -10,6 +10,7 @@ public class InputData implements Serializable {
     public String PartName;
     public String PartSpec;
     public String PartSpecName;
+    public String MSpec;
     public String Qty;
     public String UseFlag;
 
@@ -20,6 +21,7 @@ public class InputData implements Serializable {
              String PartName,
              String PartSpec,
              String PartSpecName,
+             String MSpec,
              String Qty,
              String UseFlag
     ){
@@ -29,6 +31,7 @@ public class InputData implements Serializable {
         this.PartName=PartName;
         this.PartSpec=PartSpec;
         this.PartSpecName=PartSpecName;
+        this.MSpec=MSpec;
         this.Qty=Qty;
         this.UseFlag=UseFlag;
     }

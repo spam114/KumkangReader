@@ -18,12 +18,42 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/btnScrap"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:text="불량입력"
+            android:textAllCaps="false"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:backgroundTint="#AAAAAA"
+            app:elevation="20dp"
+            app:icon="@drawable/outline_drive_file_rename_outline_white_48"
+            app:iconTint="#FFFFFF"
+            app:strokeColor="#AAAAAA" />
+
+        <Button
+            android:id="@+id/btnDeleteScrap"
+            style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+            android:layout_width="match_parent"
+            android:layout_height="80dp"
+            android:layout_marginTop="15dp"
+            android:text="불량삭제"
+            android:textColor="@color/white"
+            android:textSize="16sp"
+            app:backgroundTint="#AAAAAA"
+            app:elevation="20dp"
+            app:icon="@drawable/outline_delete_sweep_white_48"
+            app:iconTint="#FFFFFF"
+            app:strokeColor="#AAAAAA" />
+
+        <Button
             android:id="@+id/btnDelete"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
             android:layout_width="match_parent"
             android:layout_height="80dp"
             android:layout_marginTop="15dp"
-            android:text="투입삭제"
+            android:text="실적삭제"
             android:textColor="@color/white"
             android:textSize="16sp"
             app:backgroundTint="#AAAAAA"

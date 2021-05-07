@@ -318,7 +318,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
                             child.getString("IssueOutputQty"),
-                            child.getString("LocationNo")
+                            child.getString("LocationNo"),
+                            child.getString("ScrappedQty")
                     );
 
                     productionInfoArrayList.add(productionInfo);

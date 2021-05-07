@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.kumkangreader.Application.ApplicationClass;
+import com.example.kumkangreader.Dialog.ScrapDeleteDialog;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.InputData;
 import com.example.kumkangreader.R;
@@ -24,26 +25,32 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
     int layoutRsourceId;
     ArrayList data;
     String lastPart;//마지막에 추가된 품목,규격
+    String costCenter;
     public int lastPosition;//마지막에 변화된 행값
+    Handler mHandler;
     //int adapterType;//0번instruction(지시어뎁터), 1번스캔(input어뎁터)
 
 
 
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data) {
+    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String costCenter, Handler mHandler) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
         this.data = data;
+        this.costCenter=costCenter;
+        this.mHandler=mHandler;
         //this.adapterType = adapterType;
         //this.stockOutNo = stockOutNo;
     }
 
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart) {
+    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart, String costCenter, Handler mHandler) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
         this.data = data;
         this.lastPart = lastPart;
+        this.costCenter=costCenter;
+        this.mHandler=mHandler;
         //this.adapterType = adapterType;
         //this.stockOutNo = stockOutNo;
     }
@@ -71,7 +78,13 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             txtPartName.setText(((InputData) data.get(position)).PartName);
 
             TextView txtPartSpec = (TextView) row.findViewById(R.id.txtPartSpec);
-            txtPartSpec.setText(((InputData) data.get(position)).PartSpec);
+
+            if(!((InputData) data.get(position)).MSpec.equals("")){
+                txtPartSpec.setText(((InputData) data.get(position)).PartSpec+"("+((InputData) data.get(position)).MSpec+")");
+            }
+            else{
+                txtPartSpec.setText(((InputData) data.get(position)).PartSpec);
+            }
 
             TextView txtQty = (TextView) row.findViewById(R.id.txtQty);
             String qty=String.format("%.0f",Double.parseDouble(((InputData) data.get(position)).Qty));
@@ -115,9 +128,10 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             @Override
             public boolean onLongClick(View v) {
 
-                //ScrapDeleteDialog sdd = new ScrapDeleteDialog(context);
-                //sdd.getWindow().setBackgroundDrawable(new ColorDrawable(android.graphics.Color.TRANSPARENT));
-                //sdd.show();
+                ScrapDeleteDialog sdd = new ScrapDeleteDialog(context, ((InputData) data.get(position)).ItemTag, costCenter, mHandler);
+                //sdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                sdd.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
+                sdd.show();
 
 
                 return true;

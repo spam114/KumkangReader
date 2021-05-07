@@ -1,53 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/detailLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp"
     android:background="?android:attr/selectableItemBackground"
     android:gravity="center"
     android:orientation="horizontal"
-    android:weightSum="15">
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:weightSum="10">
 
     <LinearLayout
         android:id="@+id/layout2"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="3dp"
-        android:layout_weight="5.5"
-        android:gravity="center|left"
-        android:orientation="vertical"
-        android:paddingTop="3dp"
-        android:paddingBottom="3dp">
-
-        <TextView
-            android:id="@+id/txtItemTag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center|right"
-            android:paddingRight="10dp"
-            android:text="TAG번호"
-            android:textColor="#2962FF"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtCoil"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:gravity="center|right"
-            android:paddingRight="10dp"
-            android:text="코일번호"
-            android:textSize="15sp"
-            android:textStyle="bold" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/layout3"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_weight="5.5"
+        android:layout_weight="4"
         android:gravity="center|left"
         android:orientation="vertical"
         android:paddingTop="3dp"
@@ -57,19 +27,50 @@
             android:id="@+id/txtPartName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center_horizontal|left"
+            android:gravity="center|right"
             android:paddingRight="10dp"
             android:text="품명"
             android:textSize="15sp"
             android:textStyle="bold" />
 
         <TextView
-            android:id="@+id/txtPartSpec"
+            android:id="@+id/txtPartSpecName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center|right"
+            android:paddingRight="10dp"
+            android:text="규격/사양"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/layout3"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="3"
+        android:gravity="center|left"
+        android:orientation="vertical"
+        android:paddingTop="3dp"
+        android:paddingBottom="3dp">
+
+        <TextView
+            android:id="@+id/txtScrapGrade"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal|left"
+            android:paddingRight="10dp"
+            android:text="불량등급"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/txtScrapCode"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="clip_horizontal|left"
             android:paddingRight="10dp"
-            android:text="규격"
+            android:text="불량코드"
             android:textSize="15sp"
             android:textStyle="bold" />
     </LinearLayout>
@@ -78,11 +79,19 @@
         android:id="@+id/txtQty"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_weight="4"
+        android:layout_weight="2"
         android:gravity="center"
         android:text="수량"
         android:textSize="16sp"
         android:textStyle="bold" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:adjustViewBounds="true"
+        app:srcCompat="@drawable/outline_remove_circle_outline_black_48" />
 
 
 </LinearLayout>

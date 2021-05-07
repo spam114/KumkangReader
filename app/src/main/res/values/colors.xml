@@ -12,6 +12,7 @@
     <item name="light_gray" type="color">#DBD8D6</item>
     <item name="tbl_row_gray" type="color">#DBD9D6</item>
     <item name="white" type="color">#FFFFFF</item>
+    <item name="dialog_bg_color" type="color">#FFFFFF</item>
     <item name="inactive_background" type="color">#F2F2F2</item>
     <item name="inactive_text" type="color">#7E868C</item>
     <item name="light_blue" type="color">#e3f2fd</item>
