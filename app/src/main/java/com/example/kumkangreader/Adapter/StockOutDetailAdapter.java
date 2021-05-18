@@ -1,7 +1,6 @@
 package com.example.kumkangreader.Adapter;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,6 +20,7 @@ import com.example.kumkangreader.Object.ItemTag;
 import com.example.kumkangreader.Object.StockOutDetail;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -187,8 +187,8 @@ public class StockOutDetailAdapter extends ArrayAdapter<StockOutDetail> implemen
                     itemTag.ItemCnt = child.getString("ItemCnt");
                     itemList.add("   " + itemTag.ItemTag + "        " + itemTag.ItemCnt + " EA");
                 }
-
-                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(context);
+                //MaterialAlertDialogBuilder
+                MaterialAlertDialogBuilder alertBuilder = new MaterialAlertDialogBuilder(context);
                 //alertBuilder.setIcon(R.drawable.ic_launcher);
                 alertBuilder.setTitle(partName + "(" + partSpecName + ")");
 

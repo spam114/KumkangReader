@@ -60,7 +60,15 @@
             tools:ignore="LockedOrientationActivity"
             />
 
+        <activity android:name=".Activity.ActivityMoveCoil"
+            tools:ignore="LockedOrientationActivity"
+            />
+
         <activity android:name=".Activity.ActivityScrap"
+            tools:ignore="LockedOrientationActivity"
+            />
+
+        <activity android:name=".Activity.ActivityStockOutNew"
             tools:ignore="LockedOrientationActivity"
             />
 

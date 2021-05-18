@@ -12,13 +12,16 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.kumkangreader.Activity.ActivityMoveCoil;
 import com.example.kumkangreader.Activity.ActivityProductionPerformance;
+import com.example.kumkangreader.Activity.ActivityStockOutNew;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Fragment.FragmentInputCoil;
 import com.example.kumkangreader.Fragment.FragmentProduction;
 import com.example.kumkangreader.Fragment.FragmentStockOut;
 import com.example.kumkangreader.Fragment.FragmentTest;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
+import com.example.kumkangreader.Object.Coil;
 import com.example.kumkangreader.Object.ProductionInfo;
 import com.example.kumkangreader.Object.StockOut;
 import com.example.kumkangreader.Object.Users;
@@ -40,6 +43,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     FragmentInputCoil fragmentInputCoil;
     FragmentTest fragmentTest;
 
+    ImageView imageView5;//테스트용
+
     /*Fragment3 fragment3;*/
     ImageView imvQR;
     BackPressControl backpressed;
@@ -54,21 +59,34 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     TabLayout.Tab firstTab;
     TabLayout.Tab secondTab;
     TabLayout.Tab thirdTab;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
         backpressed = new BackPressControl(this);
-        this.imvQR=findViewById(R.id.imvQR);
+        this.imvQR = findViewById(R.id.imvQR);
         fragmentStockOut = new FragmentStockOut(this);
         fragmentProduction = new FragmentProduction();
  /*       this.stockOutDetailArrayList = new ArrayList<>();
         this.scanDataArrayList = new ArrayList<>();*/
-        this.productionInfoArrayList=new ArrayList<>();
-        fragmentInputCoil= new FragmentInputCoil();
-        fragmentTest= new FragmentTest();
-       /* fragment3 = new Fragment3();*/
+        this.productionInfoArrayList = new ArrayList<>();
+        fragmentInputCoil = new FragmentInputCoil();
+        fragmentTest = new FragmentTest();
+        /* fragment3 = new Fragment3();*/
         tabs = findViewById(R.id.tabs);
+        imageView5=findViewById(R.id.imageView5);
+
+        //테스트용
+        imageView5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent loginIntent = new Intent(MainActivity2.this, ActivityMoveCoil.class);
+                startActivity(loginIntent);
+
+
+            }
+        });
 
         firstTab = tabs.newTab().setText("코일입고").setIcon(R.drawable.outline_donut_small_black_48dp);
         secondTab = tabs.newTab().setText("생산실적").setIcon(R.drawable.outline_build_black_48dp);
@@ -86,15 +104,13 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         tabs2.addTab(topTab2);*/
 
 
-
-        if(Users.authorityList.contains(0) || Users.authorityList.contains(1)){//0:관리자 1:생산
+        if (Users.authorityList.contains(0) || Users.authorityList.contains(1)) {//0:관리자 1:생산
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragmentProduction).commit();//첫실행 fragment
             firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
             secondTab.setIcon(R.drawable.baseline_build_black_48dp);
             thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);
             tabs.selectTab(secondTab);
-        }
-        else if(Users.authorityList.contains(2)) {//2:출고권한만 가졌을시
+        } else if (Users.authorityList.contains(2)) {//2:출고권한만 가졌을시
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragmentStockOut).commit();//첫실행 fragment
             firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
             secondTab.setIcon(R.drawable.outline_build_black_48dp);
@@ -115,17 +131,15 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
                 Fragment selected = null;
-                if(position == 0) {
+                if (position == 0) {
                     selected = fragmentInputCoil;
                     firstTab.setIcon(R.drawable.baseline_donut_small_black_48dp);
 
-                }
-                else if(position == 1) {
+                } else if (position == 1) {
                     selected = fragmentProduction;
                     secondTab.setIcon(R.drawable.baseline_build_black_48dp);
 
-                }
-                else if(position == 2) {
+                } else if (position == 2) {
                     selected = fragmentStockOut;
                     thirdTab.setIcon(R.drawable.baseline_local_shipping_black_48dp);
                 }
@@ -137,13 +151,11 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
-                if(position == 0) {
+                if (position == 0) {
                     firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
-                }
-                else if(position == 1) {
+                } else if (position == 1) {
                     secondTab.setIcon(R.drawable.outline_build_black_48dp);
-                }
-                else if(position == 2) {
+                } else if (position == 2) {
                     thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);
                 }
             }
@@ -198,23 +210,19 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         });*/
 
 
-
-
         imvQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity2.this);
                 intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
-                if(firstTab.isSelected()){//코일입고
+                if (firstTab.isSelected()) {//코일입고
                     //intentIntegrator.(MAIN_COIL_INPUT);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_coil_input));
-                }
-                else if(secondTab.isSelected()){//생산실적
-                  //  intentIntegrator.setRequestCode(MAIN_PRODUCTION);
+                } else if (secondTab.isSelected()) {//생산실적
+                    //  intentIntegrator.setRequestCode(MAIN_PRODUCTION);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_production));
-                }
-                else{//출고등록
-                   // intentIntegrator.setRequestCode(MAIN_STOCKOUT);
+                } else {//출고등록
+                    // intentIntegrator.setRequestCode(MAIN_STOCKOUT);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
                 }
                 // intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
@@ -229,7 +237,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_STOCKOUT) {//ActivityStockOut에서 돌아옴
-           // this.productionInfoArrayList = new ArrayList<>();
+            // this.productionInfoArrayList = new ArrayList<>();
    /*         this.stockOutDetailArrayList = new ArrayList<>();
             this.scanDataArrayList = new ArrayList<>();*/
         }
@@ -240,10 +248,19 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 String scanResult;
                 scanResult = result.getContents();
 
-                if(firstTab.isSelected()) {//코일입고
-                    Toast.makeText(this, scanResult,Toast.LENGTH_LONG).show();//Test 용
-                }
-                else if(secondTab.isSelected()) {//생산실적
+                if (firstTab.isSelected()) {//코일입고
+                    //Toast.makeText(this, scanResult,Toast.LENGTH_LONG).show();//Test 용
+
+                    String url = getString(R.string.service_address) + "inputCoil";
+                    ContentValues values = new ContentValues();
+                    values.put("CoilNo", scanResult);
+                    values.put("BusinessClassCode", "2");
+                    values.put("UserCode", Users.PhoneNumber);
+                    values.put("Zone", "A");//일단 A로고정
+                    InputCoil gsod = new InputCoil(url, values);
+                    gsod.execute();
+
+                } else if (secondTab.isSelected()) {//생산실적
                     try {
                         String[] array = scanResult.split("/");
                         String worksOrderNo = array[0];
@@ -254,13 +271,12 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                         values.put("CostCenter", costCenter);
                         GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values);
                         gsod.execute();
-                    }
-                    catch (ArrayIndexOutOfBoundsException aoe){
+                    } catch (ArrayIndexOutOfBoundsException aoe) {
                         Toast.makeText(this, "올바른 발주서 태그가 아닙니다.", Toast.LENGTH_SHORT).show();
                     }
-                }
-                else {//출고등록
-                    fragmentStockOut.callGetStockOutMaster(scanResult);
+                } else {//출고등록
+                    //fragmentStockOut.callGetStockOutMaster(scanResult); //과거버전
+                    getStockOutMaster(scanResult);
                 }
             }
         } else {
@@ -268,18 +284,28 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         }
     }
 
+    private void getStockOutMaster(String scanResult){
+        String url=getString(R.string.service_address) + "getStockOutMaster";
+        ContentValues values = new ContentValues();
+        values.put("ScanInput", scanResult);
+        GetStockOutMaster gsom = new GetStockOutMaster(url, values, scanResult);
+        gsom.execute();
+    }
 
-    public class GetProductionBasicInfo extends AsyncTask<Void, Void, String> {
+
+    public class GetStockOutMaster extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        GetProductionBasicInfo(String url, ContentValues values){
+        String stockOutNo;
+        GetStockOutMaster(String url, ContentValues values, String stockOutNo){
             this.url = url;
             this.values = values;
+            this.stockOutNo=stockOutNo;
         }
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-            //progress bar를 보여주는 등등의 행위
+            //progress bar를 보여주는 등의 행위
             startProgress();
         }
         @Override
@@ -289,6 +315,152 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             result = requestHttpURLConnection.request(url, values);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+            try {
+                //Log.i("ReadJSONFeedTask", result);
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                String StockOutNo = "";
+                String CustomerLocation = "";
+                String AreaCarNumber = "";
+
+                JSONObject child = jsonArray.getJSONObject(0);
+
+                if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                    ErrorCheck = child.getString("ErrorCheck");
+                    Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                StockOutNo = child.getString("StockOutNo");
+                CustomerLocation = child.getString("CustomerLocation");
+                AreaCarNumber = child.getString("AreaCarNumber");
+
+                stockOut = new StockOut();
+                stockOut.StockOutNo = StockOutNo;
+                stockOut.CustomerLocation = CustomerLocation;
+                stockOut.AreaCarNumber = AreaCarNumber;
+
+                Intent i = new Intent(getBaseContext(), ActivityStockOutNew.class);
+                i.putExtra("stockOut", stockOut);
+                startActivityForResult(i, REQUEST_STOCKOUT);
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+
+    public class InputCoil extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        InputCoil(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+
+                //ProductionInfo productionInfo;
+                Coil coil;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+
+                String coilNo="";
+                String partCode="";
+                String partSpec="";
+                String locationNo="";
+                String maxRow="";
+                String maxCol="";
+                ArrayList<Coil> coilArrayList = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    coilNo = child.getString("CoilNo");
+                    partCode = child.getString("PartCode");
+                    partSpec = child.getString("PartSpec");
+                    locationNo = child.getString("LocationNo");
+                    maxRow = child.getString("MaxRow");
+                    maxCol = child.getString("MaxCol");
+                }
+
+                Intent i = new Intent(getBaseContext(), ActivityMoveCoil.class);
+                i.putExtra("coilNo", coilNo);
+                i.putExtra("partCode", partCode);
+                i.putExtra("partSpec", partSpec);
+                i.putExtra("locationNo", locationNo);
+                i.putExtra("maxRow", maxRow);
+                i.putExtra("maxCol", maxCol);
+                startActivityForResult(i, REQUEST_PRODUCTION);
+
+                Toast.makeText(getBaseContext(), "코일 입고가 완료되었습니다.\n적재위치를 선택하여 주세요.", Toast.LENGTH_LONG).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+
+    public class GetProductionBasicInfo extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetProductionBasicInfo(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
         @Override
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
@@ -303,7 +475,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 ProductionInfo productionInfo;
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
-                productionInfoArrayList=new ArrayList<>();
+                productionInfoArrayList = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
@@ -324,10 +496,10 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
                     productionInfoArrayList.add(productionInfo);
                 }
-                worksOrderNo=productionInfoArrayList.get(0).WorksOrderNo;
-                costCenter=productionInfoArrayList.get(0).CostCenter;
-                costCenterName=productionInfoArrayList.get(0).CostCenterName;
-                locationNo=productionInfoArrayList.get(0).LocationNo;
+                worksOrderNo = productionInfoArrayList.get(0).WorksOrderNo;
+                costCenter = productionInfoArrayList.get(0).CostCenter;
+                costCenterName = productionInfoArrayList.get(0).CostCenterName;
+                locationNo = productionInfoArrayList.get(0).LocationNo;
                 /*int totalQty = 0;
                 int totalScanQty = 0;
                 for (int j = 0; j < stockOutDetailArrayList.size(); j++) {
@@ -337,16 +509,15 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
                 Intent i = new Intent(getBaseContext(), ActivityProductionPerformance.class);
                 i.putExtra("productionInfoArrayList", productionInfoArrayList);
-                i.putExtra("worksOrderNo",worksOrderNo);
-                i.putExtra("costCenter",costCenter);
-                i.putExtra("costCenterName",costCenterName);
+                i.putExtra("worksOrderNo", worksOrderNo);
+                i.putExtra("costCenter", costCenter);
+                i.putExtra("costCenterName", costCenterName);
                 i.putExtra("locationNo", locationNo);
                 startActivityForResult(i, REQUEST_PRODUCTION);
 
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 progressOFF();
             }
 
@@ -373,7 +544,6 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
     }
-
 
 
     private void startProgress() {

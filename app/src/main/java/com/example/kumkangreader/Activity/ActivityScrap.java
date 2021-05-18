@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import com.example.kumkangreader.Adapter.ScrapAdapter;
 import com.example.kumkangreader.Object.ScrapData;
@@ -46,6 +47,10 @@ public class ActivityScrap extends BaseActivity {
         @Override
         public void handleMessage(Message msg) {
             scrapDataArrayList = (ArrayList<ScrapData>)msg.getData().getSerializable("scrapDataArrayList");
+            if(scrapDataArrayList.size()==0){
+                Toast.makeText(ActivityScrap.this, "등록 된 불량품이 없습니다.", Toast.LENGTH_SHORT).show();
+                finish();
+            }
             scrapAdapter=new ScrapAdapter(ActivityScrap.this, R.layout.listview_scrap_row, scrapDataArrayList, itemTag, costCenter, mHandler);
             listViewScrap.setAdapter(scrapAdapter);
         }
@@ -54,7 +59,7 @@ public class ActivityScrap extends BaseActivity {
     private void Scannerinitialize() {
         /*mSavedStatus = mCurrentStatus = STATUS_CLOSE;
         mIsRegisterReceiver = false;
-
+3
         Intent intent = new Intent();
         String action = Constants.ACTION_BARCODE_CLOSE;
         int seq = SEQ_BARCODE_CLOSE;

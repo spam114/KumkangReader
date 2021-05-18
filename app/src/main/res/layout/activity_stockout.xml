@@ -125,7 +125,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
                 android:text="총지시"
-                android:textColor="#FFEB3B" />
+                android:textColor="#D50000" />
 
             <TextView
                 android:id="@+id/txtTotalScanQty"
@@ -133,7 +133,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginRight="15dp"
                 android:text="총출고"
-                android:textColor="#E91E1E" />
+                android:textColor="#FFD600" />
         </LinearLayout>
 
     </LinearLayout>

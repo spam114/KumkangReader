@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item type="id" name="objBin" />
+    <item type="id" name="rowIndex" />
+    <item type="id" name="colIndex" />
+    <item type="id" name="binNo" />
+</resources>

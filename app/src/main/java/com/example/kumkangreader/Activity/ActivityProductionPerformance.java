@@ -183,6 +183,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("LocationNo", locationNo);*/
         values.put("ItemTag", itemTag);
         values.put("CostCenter", costCenter);
+        values.put("UserCode", Users.PhoneNumber);
         JudgeInputOutput gsod = new JudgeInputOutput(url, values);
         gsod.execute();
     }

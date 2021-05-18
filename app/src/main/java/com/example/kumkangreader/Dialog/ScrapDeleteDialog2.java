@@ -500,7 +500,6 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
             } finally {
                 progressOFF();
             }
-
         }
     }
 

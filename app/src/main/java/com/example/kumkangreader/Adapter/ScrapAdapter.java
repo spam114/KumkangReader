@@ -246,6 +246,14 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
 
                 ArrayList<ScrapData> scrapDataArrayList = new ArrayList<>();
 
+                if(jsonArray.length()==0){//데이터가 없
+                    Bundle data = new Bundle();
+                    Message msg= mHandler.obtainMessage();
+                    data.putSerializable("scrapDataArrayList", scrapDataArrayList);
+                    msg.setData(data);
+                    mHandler.sendMessage(msg);
+                }
+
                 for (int i = 0; i < jsonArray.length(); i++) {
                     ScrapData scrapData;
                     JSONObject child = jsonArray.getJSONObject(i);
