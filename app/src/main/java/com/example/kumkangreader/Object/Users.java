@@ -26,4 +26,9 @@ public class Users {
 
     //해상도에 따른 폰트크기
     public static float ScreenInches=0;
+
+    /**
+     * 주간, 야간, 1교대, 2교대, 3교대
+     */
+    public static String Group = "주간";
 }

@@ -44,7 +44,7 @@ public class ActivityMoveCoil extends BaseActivity {
     int maxRow = 0;
     int maxCol = 0;
     float textSize=0;
-
+    TextView txtSelectedCoil;
     ArrayList<Bin> binArrayList;
 
     public void startProgress() {
@@ -62,6 +62,7 @@ public class ActivityMoveCoil extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move_coil);
         textSize=Users.ScreenInches*2;
+        this.txtSelectedCoil=findViewById(R.id.txtSelectedCoil);
 
         //잠깐주석
         binArrayList=new ArrayList<>();
@@ -72,6 +73,7 @@ public class ActivityMoveCoil extends BaseActivity {
         this.maxRow = Integer.parseInt(getIntent().getStringExtra("maxRow"));
         this.maxCol = Integer.parseInt(getIntent().getStringExtra("maxCol"));
         this.zone="A";//zone A로 고정
+        this.txtSelectedCoil.setText(this.coilNo);
         /*this.maxRow = 12;
         this.maxCol = 4;*/
         getBin();
@@ -383,7 +385,7 @@ public class ActivityMoveCoil extends BaseActivity {
 
                     new MaterialAlertDialogBuilder(ActivityMoveCoil.this)
                             .setTitle("코일 적재")
-                            .setMessage("코일을 '"+binNo+"'에 적재하겠습니까?")
+                            .setMessage("코일("+coilNo+")을 '"+binNo+"'에 적재하겠습니까?")
                             .setCancelable(true)
                             .setPositiveButton
                                     ("확인", new DialogInterface.OnClickListener() {

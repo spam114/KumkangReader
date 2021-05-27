@@ -23,6 +23,7 @@ import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Fragment.FragmentInputCoil;
 import com.example.kumkangreader.Fragment.FragmentProduction;
 import com.example.kumkangreader.Fragment.FragmentStockOut;
+import com.example.kumkangreader.Fragment.FragmentStopOperation;
 import com.example.kumkangreader.Fragment.FragmentTest;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.Coil;
@@ -44,9 +45,9 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     //TabLayout tabs2;
     FragmentStockOut fragmentStockOut;
     FragmentProduction fragmentProduction;
-
     FragmentInputCoil fragmentInputCoil;
     FragmentTest fragmentTest;
+    FragmentStopOperation fragmentStopOperation;
 
     ImageView imageView5;//테스트용
 
@@ -64,6 +65,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     TabLayout.Tab firstTab;
     TabLayout.Tab secondTab;
     TabLayout.Tab thirdTab;
+    TabLayout.Tab fourthTab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -73,6 +75,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         this.imvQR = findViewById(R.id.imvQR);
         fragmentStockOut = new FragmentStockOut(this);
         fragmentProduction = new FragmentProduction(this);
+        fragmentStopOperation =  new FragmentStopOperation(this);
  /*       this.stockOutDetailArrayList = new ArrayList<>();
         this.scanDataArrayList = new ArrayList<>();*/
         this.productionInfoArrayList = new ArrayList<>();
@@ -136,9 +139,12 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         firstTab = tabs.newTab().setText("코일입고").setIcon(R.drawable.outline_donut_small_black_48dp);
         secondTab = tabs.newTab().setText("생산실적").setIcon(R.drawable.outline_build_black_48dp);
         thirdTab = tabs.newTab().setText("출고등록").setIcon(R.drawable.outline_local_shipping_black_48dp);
+        fourthTab = tabs.newTab().setText("비가동").setIcon(R.drawable.outline_do_not_disturb_on_black_24);
         tabs.addTab(firstTab);
         tabs.addTab(secondTab);
+        tabs.addTab(fourthTab);
         tabs.addTab(thirdTab);
+
 /*
         tabs2=findViewById(R.id.tabs2);
         final TabLayout.Tab topTab;
@@ -154,12 +160,14 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
             secondTab.setIcon(R.drawable.baseline_build_black_48dp);
             thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);
+            fourthTab.setIcon(R.drawable.outline_do_not_disturb_on_black_24);
             tabs.selectTab(secondTab);
         } else if (Users.authorityList.contains(2)) {//2:출고권한만 가졌을시
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragmentStockOut).commit();//첫실행 fragment
             firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
             secondTab.setIcon(R.drawable.outline_build_black_48dp);
             thirdTab.setIcon(R.drawable.baseline_local_shipping_black_48dp);
+            fourthTab.setIcon(R.drawable.outline_do_not_disturb_on_black_24);
             tabs.selectTab(thirdTab);
         }
 
@@ -175,6 +183,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 int position = tab.getPosition();
+                imvQR.setVisibility(View.VISIBLE);
                 Fragment selected = null;
                 if (position == 0) {
                     selected = fragmentInputCoil;
@@ -184,9 +193,14 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     selected = fragmentProduction;
                     secondTab.setIcon(R.drawable.baseline_build_black_48dp);
 
-                } else if (position == 2) {
+                } else if (position == 3) {
                     selected = fragmentStockOut;
                     thirdTab.setIcon(R.drawable.baseline_local_shipping_black_48dp);
+                }
+                else if (position==2){
+                    imvQR.setVisibility(View.INVISIBLE);
+                    selected = fragmentStopOperation;
+                    fourthTab.setIcon(R.drawable.baseline_do_not_disturb_on_black_24);
                 }
                 /*else if(position == 2)
                     selected = fragment3;*/
@@ -200,8 +214,11 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
                 } else if (position == 1) {
                     secondTab.setIcon(R.drawable.outline_build_black_48dp);
-                } else if (position == 2) {
+                } else if (position == 3) {
                     thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);
+                }
+                else if (position == 2) {
+                    fourthTab.setIcon(R.drawable.outline_do_not_disturb_on_black_24);
                 }
             }
 
@@ -266,10 +283,14 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 } else if (secondTab.isSelected()) {//생산실적
                     //  intentIntegrator.setRequestCode(MAIN_PRODUCTION);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_production));
-                } else {//출고등록
+                }  else if (thirdTab.isSelected()) {//출고등록
                     // intentIntegrator.setRequestCode(MAIN_STOCKOUT);
                     intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
                 }
+                else{//비가동
+
+                }
+
                 // intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
                 intentIntegrator.initiateScan();
             }

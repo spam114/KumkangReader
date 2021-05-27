@@ -3,7 +3,9 @@ package com.example.kumkangreader.Activity;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.Paint;
 import android.graphics.Point;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,17 +37,16 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class ActivityMoveCoil2 extends BaseActivity {
-
-    String coilNo = "";
-    String partCode = "";
-    String partSpec = "";
     String locationNo = "";
     String zone="";
     int maxRow = 0;
     int maxCol = 0;
     float textSize=0;
-
+    TextView txtSelectedCoil;
     ArrayList<Bin> binArrayList;
+    String selectedCoil;
+    String selectedPartCode;
+    String selectedPartSpec;
 
     public void startProgress() {
         progressON("Loading...");
@@ -62,6 +63,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move_coil2);
         textSize=Users.ScreenInches*2;
+        this.txtSelectedCoil=findViewById(R.id.txtSelectedCoil);
 
         //잠깐주석
         binArrayList=new ArrayList<>();
@@ -69,6 +71,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
         this.maxRow = Integer.parseInt(getIntent().getStringExtra("maxRow"));
         this.maxCol = Integer.parseInt(getIntent().getStringExtra("maxCol"));
         this.zone="A";//zone A로 고정
+
+        SelectCoilData("","","");
         /*this.maxRow = 12;
         this.maxCol = 4;*/
         getBin();
@@ -146,6 +150,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     binArrayList.add(bin);
                 }
                 DrawTable();
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -324,6 +329,13 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     tvNo.setTag(R.id.binNo, bin);
                     tvNo.setOnClickListener(mOnclickListener);
 
+                    if(binContent!=null) {
+                        if (binContent.LinkCode.equals(selectedCoil)) {
+                            tvNo.setTypeface(null, Typeface.BOLD_ITALIC);
+                            tvNo.setPaintFlags(tvNo.getPaintFlags() | Paint.UNDERLINE_TEXT_FLAG);
+                        }
+                    }
+
                 /*TableRow.LayoutParams tlparams = new TableRow.LayoutParams();
                 tlparams.width=width/4;
                 tlparams.height=300;
@@ -363,41 +375,42 @@ public class ActivityMoveCoil2 extends BaseActivity {
                 @Override
                 public void onClick(View v) {
 
-                        /*dailyCost = (DailyCost2)v.getTag(R.id.costDate);
-
-                        String costType = v.getTag(R.id.costType).toString();
-                        String type = toCostType(v.getTag(R.id.costType).toString());
-                        String date = dailyCost.CostDate.toString();
-
-                        //다이알로그
-                        ShowDialog(dailyCost, costType, type, date, (TextView)v);*/
-
                     Bin bin = (Bin) v.getTag(R.id.objBin);
                     final String rowIndex = v.getTag(R.id.rowIndex).toString();
                     final String colIndex = v.getTag(R.id.colIndex).toString();
                     String binNo=v.getTag(R.id.binNo).toString();
-                    if (bin != null)//들어있으면 이동불가
-                        return;
-
-                    new MaterialAlertDialogBuilder(ActivityMoveCoil2.this)
-                            .setTitle("코일 적재")
-                            .setMessage("코일을 '"+binNo+"'에 적재하겠습니까?")
-                            .setCancelable(true)
-                            .setPositiveButton
-                                    ("확인", new DialogInterface.OnClickListener() {
-
-                                        @Override
-                                        public void onClick(DialogInterface dialog, int which) {
-                                            moveCoil("A", colIndex, rowIndex, coilNo, partCode, partSpec);
-                                        }
-                                    }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(ActivityMoveCoil2.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                    if (bin != null) {//데이터가 들어있다면 -> 이동할 코일 선택
+                        //여기만적용
+                        SelectCoilData(bin.LinkCode, bin.PartCode, bin.PartSpec);
+                        getBin();
+                    }
+                    else{//데이터가 들어가있지 않다면
+                        if(selectedCoil.equals("")){//선택안한상태
+                            Toast.makeText(ActivityMoveCoil2.this, "이동할 코일을 선택하여 주세요.", Toast.LENGTH_SHORT).show();
+                            getBin();
                         }
-                    }).show();
+                        else{//선택한상태
+                            //코일적재
+                            new MaterialAlertDialogBuilder(ActivityMoveCoil2.this)
+                                    .setTitle("코일 적재")
+                                    .setMessage("코일("+selectedCoil+")을 '"+binNo+"'에 적재하겠습니까?")
+                                    .setCancelable(true)
+                                    .setPositiveButton
+                                            ("확인", new DialogInterface.OnClickListener() {
 
-
+                                                @Override
+                                                public void onClick(DialogInterface dialog, int which) {
+                                                    moveCoil("A", colIndex, rowIndex, selectedCoil, selectedPartCode, selectedPartSpec);
+                                                }
+                                            }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Toast.makeText(ActivityMoveCoil2.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                                }
+                            }).show();
+                        }
+                    }
+                    return;
                 }
 
 
@@ -459,6 +472,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                         return;
                     }
                 }
+                //코일 이동후 미선택 코일 미선택 상태로 변경
+                SelectCoilData("","","");
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -467,6 +482,19 @@ public class ActivityMoveCoil2 extends BaseActivity {
                 progressOFF();
             }
 
+        }
+    }
+
+    private void SelectCoilData(String coilNo, String partCode, String partSpec){
+        selectedCoil=coilNo;
+        selectedPartCode=partCode;
+        selectedPartSpec=partSpec;
+
+        if(coilNo.equals("")){
+            this.txtSelectedCoil.setText("이동시킬 코일을 선택");
+        }
+        else{
+            this.txtSelectedCoil.setText("선택된 코일("+coilNo+")");
         }
     }
 
