@@ -90,7 +90,6 @@ public class StockOutDetailAdapter extends ArrayAdapter<StockOutDetail> implemen
                 textViewPartName.setBackgroundColor(Color.YELLOW);
                 textViewPartSpecName.setBackgroundColor(Color.YELLOW);
                 layoutQty.setBackgroundColor(Color.YELLOW);
-
                 this.lastPosition = position;
             }
 

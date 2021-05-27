@@ -1,12 +1,17 @@
 package com.example.kumkangreader.Activity;
 
 import android.content.ContentValues;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -20,6 +25,8 @@ import com.example.kumkangreader.Object.ProductionInfo;
 import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -45,6 +52,8 @@ public class ActivityProductionPerformance extends BaseActivity {
     ListView listViewInput;
     ListView listViewOutput;
     ImageView imvQR;
+    TextInputEditText edtScan;
+
 
     public void startProgress() {
 
@@ -82,7 +91,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
         this.txtScrappedQty=findViewById(R.id.txtScrappedQty);
         this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
-
+        this.edtScan=findViewById(R.id.edtScan);
 
         this.imvQR = findViewById(R.id.imvQR);
         getInputData("","");//투입정보 가져오기
@@ -98,7 +107,31 @@ public class ActivityProductionPerformance extends BaseActivity {
             }
         });
 
+        this.edtScan.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    edtScan.setGravity(Gravity.START);
+                }
+                else{
+                    edtScan.setGravity(Gravity.CENTER_HORIZONTAL);
+                }
+            }
+        });
 
+        this.edtScan.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){ // IME_ACTION_SEARCH , IME_ACTION_GO
+
+                    judgeInputOutput(v.getText().toString().toUpperCase());
+                }
+                return false;
+            }
+        });
+
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
         //출고
 
         //생산실적 셋팅
@@ -139,10 +172,13 @@ public class ActivityProductionPerformance extends BaseActivity {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
+        if(requestCode==Users.REQUEST_SCRAP){
+            getProductionBasicInfo();
+        }
       /*  if (requestCode == REQUEST_STOCKOUT) {//ActivityStockOut에서 돌아옴
         }*/
 
-        if (result != null) {
+        else if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
             } else {
@@ -150,7 +186,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                 scanResult = result.getContents();
                 judgeInputOutput(scanResult);
             }
-        } else {
+        }
+        else {
             super.onActivityResult(requestCode, resultCode, data);
         }
     }
@@ -471,6 +508,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
                 int type = -1;//1:Input, 2:Output
+                //String[] coilArr=new String[jsonArray.length()];
+                ArrayList<String> coilArrayList=new ArrayList<>();
                 //outputDataArrayList = new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
@@ -479,8 +518,50 @@ public class ActivityProductionPerformance extends BaseActivity {
                         Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    else if(!child.getString("CoilNo").equals("null")){//중복된 코일이 존재한다.
+                        coilArrayList.add(child.getString("CoilNo"));
+                        continue;
+                    }
                     type = Integer.parseInt(child.getString("Type"));
                 }
+
+                if(coilArrayList.size()>0){
+                    //중복코일이 존재할 경우 선택창 출력
+
+                    final String coilArr[]= new String[coilArrayList.size()];
+
+                    for (int i = 0; i < coilArrayList.size(); i++) {
+                        coilArr[i]=coilArrayList.get(i);
+                    }
+
+                    MaterialAlertDialogBuilder alertBuilder= new MaterialAlertDialogBuilder(ActivityProductionPerformance.this);
+                    alertBuilder.setTitle("코일번호 선택");
+                    final String[] selectedCoil = {""};
+                    alertBuilder.setSingleChoiceItems(coilArr, 0, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            selectedCoil[0] =coilArr[which];
+                        }
+                    });
+                    alertBuilder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            judgeInputOutput(selectedCoil[0]);
+                            dialog.dismiss();
+                        }
+                    });
+                    alertBuilder.setNeutralButton("취소", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+
+                            dialog.dismiss();
+                        }
+                    });
+                    alertBuilder.show();
+                    progressOFF();
+                    return;
+                }
+
                 //1: Input, 2: Output
                 if (type == 1) {//Input: 투입
                     setInputData(values.get("ItemTag").toString());
@@ -488,6 +569,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                     setOutputData(values.get("ItemTag").toString());
                 } else {
                     Toast.makeText(getBaseContext(), "투입, 실적 TAG정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                    progressOFF();
                     return;
                 }
 

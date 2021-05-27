@@ -23,6 +23,10 @@ import com.example.kumkangreader.RequestHttpURLConnection;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+/**
+ * 투입 삭제 다이얼로그
+ */
+
 public class ScrapDeleteDialog extends Dialog implements BaseActivityInterface {
 
     Context context;
@@ -31,6 +35,7 @@ public class ScrapDeleteDialog extends Dialog implements BaseActivityInterface {
     String itemTag;
     String costCenter;
     Handler mHandler;
+
 
     public ScrapDeleteDialog(@NonNull Context context, String itemTag, String costCenter, Handler mHandler) {
         super(context);

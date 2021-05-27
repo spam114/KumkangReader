@@ -16,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 
 import com.example.kumkangreader.Activity.ActivityScrap;
+import com.example.kumkangreader.Activity.BaseActivity;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.OutputData;
@@ -30,6 +31,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+/**
+ * 생산실적 삭제 다이얼로그
+ */
 
 public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface {
 
@@ -193,7 +198,10 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                 i.putExtra("itemTag",itemTag);
                 i.putExtra("costCenter",costCenter);
 
-                context.startActivity(i);
+                //context.startActivity(i);
+
+
+                ((BaseActivity)(context)).startActivityForResult(i,Users.REQUEST_SCRAP);
                 dismiss();
 
             } catch (Exception e) {

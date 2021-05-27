@@ -2,14 +2,15 @@ package com.example.kumkangreader.Activity;
 
 import android.content.ContentValues;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -18,6 +19,7 @@ import android.widget.Toast;
 import com.example.kumkangreader.Adapter.StockOutDetailAdapter;
 import com.example.kumkangreader.Object.StockOut;
 import com.example.kumkangreader.Object.StockOutDetail;
+import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 import com.google.android.material.textfield.TextInputEditText;
@@ -86,11 +88,22 @@ public class ActivityStockOutNew extends BaseActivity{
             }
         });
 
+        this.edtScan.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){ // IME_ACTION_SEARCH , IME_ACTION_GO
+                    ActionScan("EI-"+v.getText().toString());
+                }
+                return false;
+            }
+        });
+
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-        getStockOut();
+        getStockOut("");
     }
 
-    private void getStockOut() {
+    private void getStockOut(String lastPart) {
         String url = getString(R.string.service_address) + "getStockOut";
         ContentValues values = new ContentValues();
         values.put("StockOutNo", this.stockOut.StockOutNo);
@@ -153,13 +166,13 @@ public class ActivityStockOutNew extends BaseActivity{
 
         if(itemTag.equals("1")){//입력모드
             this.mode=1;
-            this.txtMode.setText("-  입력모드");
-            this.txtMode.setTextColor(Color.parseColor("#FFEB3B"));
+            this.txtMode.setText("입력모드");
+            //this.txtMode.setTextColor(Color.parseColor("#FFEB3B"));
         }
         else if(itemTag.equals("2")){//삭제모드
             this.mode=2;
-            this.txtMode.setText("-  삭제모드");
-            this.txtMode.setTextColor(Color.RED);
+            this.txtMode.setText("삭제모드");
+            //this.txtMode.setTextColor(Color.RED);
         }
         else if(itemTag.equals("3")){//완료
             this.mode=3;
@@ -174,6 +187,8 @@ public class ActivityStockOutNew extends BaseActivity{
                 values.put("PhoneNumber", Users.PhoneNumber);
                 SetItemTag sit = new SetItemTag(url, values);
                 sit.execute();*/
+                //checkTagState(itemTag);
+                setStockOut(itemTag);
             }
             else if(this.mode==2){//삭제
                 /*String url=getString(R.string.service_address) + "deleteItemTag";
@@ -183,6 +198,8 @@ public class ActivityStockOutNew extends BaseActivity{
                 values.put("PhoneNumber", Users.PhoneNumber);
                 ActivityStockOut.DeleteItemTag dit = new ActivityStockOut.DeleteItemTag(url, values);
                 dit.execute();*/
+
+                deleteStockOut(itemTag);
             }
             else if(this.mode==3){//완료(닫기)
                 this.finish();
@@ -190,6 +207,137 @@ public class ActivityStockOutNew extends BaseActivity{
         }
     }
 
+    private void setStockOut(String itemTag) {
+        String url = getString(R.string.service_address) + "setStockOut";
+        ContentValues values = new ContentValues();
+        values.put("StockOutNo", this.stockOut.StockOutNo);
+        values.put("ItemTag", itemTag);
+        values.put("UserCode", Users.PhoneNumber);
+        SetStockOut gsod = new SetStockOut(url, values);
+        gsod.execute();
+    }
+
+    private void deleteStockOut(String itemTag) {
+        String url = getString(R.string.service_address) + "deleteStockOut";
+        ContentValues values = new ContentValues();
+        values.put("StockOutNo", this.stockOut.StockOutNo);
+        values.put("ItemTag", itemTag);
+        values.put("UserCode", Users.PhoneNumber);
+        DeleteStockOut gsod = new DeleteStockOut(url, values);
+        gsod.execute();
+    }
+
+    public class SetStockOut extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        SetStockOut(String url, ContentValues values){
+            this.url = url;
+            this.values = values;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등의 행위
+            startProgress();
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck="";
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+
+                    if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck=child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    lastPart=child.getString("PartCode")+"-"+child.getString("PartSpec");
+                }
+                getStockOut(lastPart);
+                Toast.makeText(getBaseContext(), "등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+
+    public class DeleteStockOut extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        DeleteStockOut(String url, ContentValues values){
+            this.url = url;
+            this.values = values;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등의 행위
+            startProgress();
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                StockOutDetail stockOutDetail;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck="";
+                stockOutDetailArrayList= new ArrayList<>();
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+
+                    if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck=child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    stockOutDetail = new StockOutDetail(child.getString("PartCode"),child.getString("PartSpec"),child.getString("PartName"),
+                            child.getString("PartSpecName"),child.getString("OutQty"), child.getString("ScanQty"));
+
+                    stockOutDetailArrayList.add(stockOutDetail);
+                }
+
+                Toast.makeText(getBaseContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+
+                getStockOut("");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                progressOFF();
+            }
+
+        }
+    }
 
     /**
      * 제품태그를 스캔하여, 제품을 등록한다.
@@ -235,7 +383,6 @@ public class ActivityStockOutNew extends BaseActivity{
                     Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                     return;
                 }
-                lastPart=child.getString("PartCode")+"-"+child.getString("PartSpec");
 
                 String url=getString(R.string.service_address) + "getStockOutDetailAndScanData";
                 ContentValues values = new ContentValues();

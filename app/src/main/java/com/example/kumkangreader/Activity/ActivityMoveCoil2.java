@@ -34,7 +34,7 @@ import org.json.JSONObject;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
-public class ActivityMoveCoil extends BaseActivity {
+public class ActivityMoveCoil2 extends BaseActivity {
 
     String coilNo = "";
     String partCode = "";
@@ -60,14 +60,11 @@ public class ActivityMoveCoil extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_move_coil);
+        setContentView(R.layout.activity_move_coil2);
         textSize=Users.ScreenInches*2;
 
         //잠깐주석
         binArrayList=new ArrayList<>();
-        this.coilNo = getIntent().getStringExtra("coilNo");
-        this.partCode = getIntent().getStringExtra("partCode");
-        this.partSpec = getIntent().getStringExtra("partSpec");
         this.locationNo = getIntent().getStringExtra("locationNo");
         this.maxRow = Integer.parseInt(getIntent().getStringExtra("maxRow"));
         this.maxCol = Integer.parseInt(getIntent().getStringExtra("maxCol"));
@@ -279,16 +276,17 @@ public class ActivityMoveCoil extends BaseActivity {
 
                     //주데이터
                     TextView tvNo = new TextView(this);
-                LinearLayout.LayoutParams linearLayoutParams =
+                    LinearLayout.LayoutParams linearLayoutParams =
 
-                        new LinearLayout.LayoutParams(
-                                width / 4,
-                                300
+                            new LinearLayout.LayoutParams(
+                                    width / 4,
+                                    300
 
-                        );
+                            );
                     tvNo.setWidth(width / 4);
                     tvNo.setHeight(300);
                     tvNo.setTextSize(textSize);
+                    //tvNo.setMovementMethod(new ScrollingMovementMethod());
                     //tvNo.setSingleLine(false);
                     //tvNo.setLayoutParams(linearLayoutParams);
                     if(contents.length() != 0){
@@ -355,7 +353,7 @@ public class ActivityMoveCoil extends BaseActivity {
         }*/
         } catch (Exception e) {
             String sdf = e.getStackTrace().toString();
-            Toast.makeText(ActivityMoveCoil.this, sdf, Toast.LENGTH_SHORT).show();
+            Toast.makeText(ActivityMoveCoil2.this, sdf, Toast.LENGTH_SHORT).show();
 
         }
     }
@@ -381,7 +379,7 @@ public class ActivityMoveCoil extends BaseActivity {
                     if (bin != null)//들어있으면 이동불가
                         return;
 
-                    new MaterialAlertDialogBuilder(ActivityMoveCoil.this)
+                    new MaterialAlertDialogBuilder(ActivityMoveCoil2.this)
                             .setTitle("코일 적재")
                             .setMessage("코일을 '"+binNo+"'에 적재하겠습니까?")
                             .setCancelable(true)
@@ -395,7 +393,7 @@ public class ActivityMoveCoil extends BaseActivity {
                                     }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(ActivityMoveCoil.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(ActivityMoveCoil2.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
                         }
                     }).show();
 

@@ -108,6 +108,18 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
                 this.lastPosition = position;
             }
 
+            if ((item.CoilNo).equals(lastPart)) {//마지막 변경된 행 강조표시
+                detailLayout.setBackgroundColor(Color.YELLOW);
+
+                this.lastPosition = position;
+            }
+
+            if(item.CoilNo.length()>=4){
+                if ((item.CoilNo.substring(3).equals(lastPart))) {//마지막 변경된 행 강조표시
+                    detailLayout.setBackgroundColor(Color.YELLOW);
+            }
+                this.lastPosition = position;
+            }
 
 
             /*row.setOnClickListener(new View.OnClickListener() {

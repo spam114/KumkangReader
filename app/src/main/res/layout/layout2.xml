@@ -49,7 +49,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center_horizontal"
-            android:inputType="number" />
+            android:imeOptions="actionDone"
+            android:singleLine="true"
+            />
 
     </com.google.android.material.textfield.TextInputLayout>
 

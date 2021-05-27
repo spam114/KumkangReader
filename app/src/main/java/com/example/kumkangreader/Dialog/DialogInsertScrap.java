@@ -23,6 +23,7 @@ import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.OutputData;
 import com.example.kumkangreader.Object.ScrapCode;
 import com.example.kumkangreader.Object.ScrapGrade;
+import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 
@@ -30,6 +31,10 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+/**
+ * 불량입력 다이얼로그 : 실적(아래쪽)
+ */
 
 public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
 
@@ -135,6 +140,7 @@ public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
         values.put("Qty", this.edtQty.getText().toString());
         values.put("ScrapCode", this.spinnerScrapCode.getSelectedItem().toString());
         values.put("ScrapGrade", this.spinnerScrapGrade.getSelectedItem().toString());
+        values.put("UserCode", Users.PhoneNumber);
         SetScrap gsod = new SetScrap(url, values);
         gsod.execute();
     }

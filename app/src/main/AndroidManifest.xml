@@ -64,6 +64,10 @@
             tools:ignore="LockedOrientationActivity"
             />
 
+        <activity android:name=".Activity.ActivityMoveCoil2"
+            tools:ignore="LockedOrientationActivity"
+            />
+
         <activity android:name=".Activity.ActivityScrap"
             tools:ignore="LockedOrientationActivity"
             />

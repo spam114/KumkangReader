@@ -104,6 +104,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:adjustViewBounds="true"
+                    android:onClick="mOnClick"
                     android:paddingTop="5dp"
                     android:paddingRight="5dp"
                     app:srcCompat="@drawable/baseline_qr_code_scanner_black_48dp" />
@@ -126,6 +127,8 @@
             android:layout_gravity="center"
             android:layout_weight="0.6"
             android:gravity="center_vertical"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
             android:orientation="horizontal">
 
             <com.google.android.material.textfield.TextInputEditText
@@ -135,6 +138,7 @@
                 android:gravity="center_horizontal"
                 android:hint="인식 불가 시 입력하세요"
                 android:inputType="number"
+                android:imeOptions="actionDone"
                 android:textSize="13sp" />
         </LinearLayout>
 

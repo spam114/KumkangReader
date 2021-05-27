@@ -23,6 +23,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
 import android.telephony.TelephonyManager;
+import android.util.DisplayMetrics;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -106,6 +107,11 @@ public class SplashScreenActivity extends BaseActivity {
                 //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
             }
         }
+
+
+
+        Users.ScreenInches=(float)( getScreenInches());
+
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
         /* Duration of wait */
@@ -119,6 +125,21 @@ public class SplashScreenActivity extends BaseActivity {
                 SplashScreenActivity.this.finish();
             }
         }, SPLASH_DISPLAY_LENGTH);*/
+    }
+
+    int getScreenInches() {
+
+        DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        int width = dm.widthPixels;
+        int height = dm.heightPixels;
+        double wi = (double) width / (double) dm.xdpi;
+        double hi = (double) height / (double) dm.ydpi;
+        double x = Math.pow(wi, 2);
+        double y = Math.pow(hi, 2);
+        double screenInches = Math.sqrt(x + y);
+
+        return (int)Math.ceil(screenInches);
     }
 
     private void Scannerinitialize() {
@@ -465,6 +486,7 @@ public class SplashScreenActivity extends BaseActivity {
             // 결과에 따른 UI 수정 등은 여기서 합니다
             try {
                 Users.authorityList = new ArrayList<>();
+                Users.authorityNameList = new ArrayList<>();
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
 
@@ -472,7 +494,7 @@ public class SplashScreenActivity extends BaseActivity {
                    /* Intent loginIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     startActivity(loginIntent);
                     return;*/
-
+                    Toast.makeText(getBaseContext(), "사용자 혹은 권한이 등록되어있지 않습니다.", Toast.LENGTH_SHORT).show();
                     Intent Intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     startActivity(Intent);
                     return;
@@ -484,7 +506,10 @@ public class SplashScreenActivity extends BaseActivity {
                             Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                             return;
                         }
+                        Users.UserName=child.getString("UserName");
+                        Users.UserID=child.getString("UserID");
                         Users.authorityList.add(Integer.parseInt(child.getString("Authority")));
+                        Users.authorityNameList.add(child.getString("AuthorityName"));
                     }
                     Intent Intent = new Intent(SplashScreenActivity.this, MainActivity2.class);
                     startActivity(Intent);

@@ -9,9 +9,11 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.EditorInfo;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,6 +24,7 @@ import androidx.fragment.app.Fragment;
 import com.example.kumkangreader.Activity.ActivityStockOut;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
+import com.example.kumkangreader.MainActivity2;
 import com.example.kumkangreader.Object.StockOut;
 import com.example.kumkangreader.Object.StockOutDetail;
 import com.example.kumkangreader.R;
@@ -65,6 +68,7 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
         this.txtState = rootView.findViewById(R.id.txtState);
         this.txtVersion = rootView.findViewById(R.id.txtVersion);
         this.edtScan=rootView.findViewById(R.id.edtScan);
+        //this.edtScan.setText("2105110001");
         this.stockOutDetailArrayList = new ArrayList<>();
         this.scanDataArrayList = new ArrayList<>();
         try {
@@ -84,6 +88,18 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
                 }
             }
         });
+
+        this.edtScan.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){ // IME_ACTION_SEARCH , IME_ACTION_GO
+                    ((MainActivity2)(context)).getStockOutMaster("E3-"+v.getText().toString());
+                }
+                return false;
+            }
+        });
+
         return rootView;
     }
 

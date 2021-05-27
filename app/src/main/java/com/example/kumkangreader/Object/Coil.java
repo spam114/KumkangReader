@@ -20,4 +20,10 @@ public class Coil implements Serializable {
         this.PartSpec=PartSpec;
         this.LocationNo=LocationNo;
     }
+
+    public Coil(
+            String CoilNo
+    ){
+        this.CoilNo=CoilNo;
+    }
 }
