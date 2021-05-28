@@ -27,6 +27,7 @@ public class FragmentStopOperation extends Fragment {
 
 
 
+
       /*  this.edtScan=rootView.findViewById(R.id.edtScan);
         //this.edtScan.setText("WP0-210520-001/WP-S01");
         this.edtScan.setOnFocusChangeListener(new View.OnFocusChangeListener() {
