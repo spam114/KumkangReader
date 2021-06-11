@@ -40,6 +40,10 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
     Context context;
     TextInputEditText edtScan;
 
+    public FragmentStockOut(){
+
+    }
+
     public FragmentStockOut(Context context){
         this.context=context;
     }

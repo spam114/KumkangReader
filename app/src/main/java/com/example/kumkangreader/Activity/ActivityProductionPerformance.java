@@ -53,6 +53,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     ListView listViewOutput;
     ImageView imvQR;
     TextInputEditText edtScan;
+    String centerSpec;//1번은 코일
 
 
     public void startProgress() {
@@ -92,6 +93,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         this.txtScrappedQty=findViewById(R.id.txtScrappedQty);
         this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
         this.edtScan=findViewById(R.id.edtScan);
+        this.centerSpec=this.productionInfoArrayList.get(0).CenterSpec;
 
         this.imvQR = findViewById(R.id.imvQR);
         getInputData("","");//투입정보 가져오기
@@ -292,6 +294,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 }
                 getOutputData(itemTag2);//생산정보 가져오기
                 listViewInput.setAdapter(inputAdapter);
+                //listViewInput.setCacheColorHint(Color.TRANSPARENT);
                 listViewInput.setSelection(inputAdapter.lastPosition);
 
 
@@ -366,6 +369,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 else
                     outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag, costCenter, mHandler);
                 listViewOutput.setAdapter(outputAdapter);
+                //listViewOutput.setCacheColorHint(Color.TRANSPARENT);
                 listViewOutput.setSelection(outputAdapter.lastPosition);
                 getProductionBasicInfo();
 
@@ -375,7 +379,6 @@ public class ActivityProductionPerformance extends BaseActivity {
             } finally {
                 progressOFF();
             }
-
         }
     }
 
@@ -449,7 +452,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("InputQty"),
                             child.getString("IssueOutputQty"),
                             child.getString("LocationNo"),
-                            child.getString("ScrappedQty")
+                            child.getString("ScrappedQty"),
+                            child.getString("CenterSpec")
                     );
 
                     productionInfoArrayList.add(productionInfo);
@@ -589,7 +593,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("CostCenter", costCenter);
         values.put("LocationNo", locationNo);
         values.put("ItemTag", scanResult);
-        values.put("WorkClassCode", "A");//작업조: 기본셋팅 A 추후 변경
+        values.put("WorkClassCode", Users.WorkClassCode);//작업조: 기본셋팅 A 추후 변경
         values.put("UserCode", Users.PhoneNumber);
         SetInputData gsod = new SetInputData(url, values);
         gsod.execute();
@@ -629,6 +633,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 //OutputData outputData;
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
+                String itemTag="";
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
@@ -637,9 +642,10 @@ public class ActivityProductionPerformance extends BaseActivity {
                         Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    itemTag=child.getString("ItemTag");
                 }
 
-                getInputData(values.get("ItemTag").toString(),"");
+                getInputData(itemTag,"");
                 //1: Input, 2: Output
                /* if (type == 1) {//Input: 투입
                     setInputData();
@@ -668,7 +674,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("CostCenter", costCenter);
         values.put("LocationNo", locationNo);
         values.put("ItemTag", scanResult);
-        values.put("WorkClassCode", "A");//작업조: 기본셋팅 A 추후 변경
+        values.put("WorkClassCode", Users.WorkClassCode);//작업조: 기본셋팅 A 추후 변경
         values.put("UserCode", Users.PhoneNumber);
         SetOutputData gsod = new SetOutputData(url, values);
         gsod.execute();
@@ -708,6 +714,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 //OutputData outputData;
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
+                String itemTag="";
 
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
@@ -716,9 +723,10 @@ public class ActivityProductionPerformance extends BaseActivity {
                         Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
+                    itemTag=child.getString("ItemTag");
                 }
 
-                getInputData("", values.get("ItemTag").toString());
+                getInputData("", itemTag);
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -729,6 +737,12 @@ public class ActivityProductionPerformance extends BaseActivity {
         }
     }
 
+    /**
+     * EI가 붙어있지
+     */
+    private void PlusStringEI(){
+        //asfsdafsadfsdf
+    }
 
     private void Scannerinitialize() {
         /*mSavedStatus = mCurrentStatus = STATUS_CLOSE;

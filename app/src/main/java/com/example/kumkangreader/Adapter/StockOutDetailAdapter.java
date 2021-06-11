@@ -97,7 +97,7 @@ public class StockOutDetailAdapter extends ArrayAdapter<StockOutDetail> implemen
                 @Override
                 public void onClick(View v) {
                     //new GetOneItemData(item.PartCode, item.PartSpec, item.PartName, item.PartSpecName).execute(context.getString(R.string.service_address) + "getOneItemData");
-                    String url=context.getString(R.string.service_address) + "getOneItemData";
+                    String url=context.getString(R.string.service_address) + "getOneItemDataNew";
                     ContentValues values = new ContentValues();
                     values.put("StockOutNo", stockOutNo);
                     values.put("PartCode", item.PartCode);

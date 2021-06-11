@@ -13,6 +13,11 @@ import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.R;
 
 public class FragmentTest extends Fragment implements BaseActivityInterface {
+
+    public FragmentTest(){
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

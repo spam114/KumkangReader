@@ -12,6 +12,7 @@ public class ProductionInfo implements Serializable {
     public String IssueOutputQty;
     public String LocationNo;
     public String ScrappedQty;
+    public String CenterSpec;
 
     public ProductionInfo(
             String OutputQty,
@@ -21,7 +22,8 @@ public class ProductionInfo implements Serializable {
             String InputQty,
             String IssueOutputQty,
             String LocationNo,
-            String ScrappedQty
+            String ScrappedQty,
+            String CenterSpec
     ){
         this.OutputQty=OutputQty;
         this.CostCenter=CostCenter;
@@ -31,5 +33,6 @@ public class ProductionInfo implements Serializable {
         this.IssueOutputQty=IssueOutputQty;
         this.LocationNo=LocationNo;
         this.ScrappedQty=ScrappedQty;
+        this.CenterSpec=CenterSpec;
     }
 }

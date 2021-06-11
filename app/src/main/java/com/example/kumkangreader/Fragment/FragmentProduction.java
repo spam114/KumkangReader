@@ -23,6 +23,10 @@ public class FragmentProduction extends Fragment {
     TextInputEditText edtScan;
     Context context;
 
+    public FragmentProduction(){
+
+    }
+
     public FragmentProduction(Context context){
         this.context=context;
     }

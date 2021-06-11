@@ -26,6 +26,10 @@ public class FragmentInputCoil extends Fragment implements BaseActivityInterface
     Context context;
     Button btnMoveCoil;
 
+    public FragmentInputCoil(){
+
+    }
+
     public FragmentInputCoil(Context context){
         this.context=context;
     }

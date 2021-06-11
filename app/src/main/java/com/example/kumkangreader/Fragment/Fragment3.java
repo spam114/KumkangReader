@@ -13,6 +13,10 @@ import com.example.kumkangreader.R;
 
 public class Fragment3 extends Fragment {
 
+    public Fragment3(){
+
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {

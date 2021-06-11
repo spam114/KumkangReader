@@ -16,6 +16,10 @@ public class FragmentStopOperation extends Fragment {
     //TextInputEditText edtScan;
     Context context;
 
+    public FragmentStopOperation(){
+
+    }
+
     public FragmentStopOperation(Context context){
         this.context=context;
     }

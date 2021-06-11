@@ -186,7 +186,6 @@ public class ActivityMoveCoil extends BaseActivity {
             tv.setHeight(100);
             tv.setText("");
             tv.setBackgroundResource(R.drawable.background_tablecell);
-            tv.setTextColor(Color.BLUE);
             tv.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
             tv.setPadding(10, 25, 0, 25);
             tr.addView(tv);
@@ -205,7 +204,6 @@ public class ActivityMoveCoil extends BaseActivity {
                 tvNo.setWidth(width / 4);
                 tvNo.setHeight(100);
                 tvNo.setText(Integer.toString(j + 1));
-                tvNo.setTextColor(Color.BLUE);
                 tvNo.setBackgroundResource(R.drawable.background_tablecell);
                 tvNo.setPadding(10, 25, 0, 25);
                 tvNo.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
@@ -221,8 +219,10 @@ public class ActivityMoveCoil extends BaseActivity {
                 tvRow.setWidth(100);
                 tvRow.setHeight(300);
                 tvRow.setText(Integer.toString(i + 1));
-                tvRow.setBackgroundResource(R.drawable.background_tablecell);
-                tvRow.setTextColor(Color.BLUE);
+                if (i % 2 == 1)//홀수행
+                    tvRow.setBackgroundResource(R.drawable.background_tablecell);
+                else
+                    tvRow.setBackgroundResource(R.drawable.background_table_white);
                 tvRow.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
                 tvRow.setPadding(10, 25, 0, 25);
                 tableRow.addView(tvRow);
@@ -273,21 +273,21 @@ public class ActivityMoveCoil extends BaseActivity {
                     if (contents.length() != 0) {
                         ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#000BFF")), 0, partLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                         ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#C00000")), partLength, partLength+coilLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#000000")), partLength+coilLength, partLength+coilLength+publishDateLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#7030A0")), partLength+coilLength+publishDateLength, partLength+coilLength+publishDateLength+weightLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#000000")), partLength + coilLength, partLength + coilLength + publishDateLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                        ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#7030A0")), partLength + coilLength + publishDateLength, partLength + coilLength + publishDateLength + weightLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     }
                     //ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#002060")), totalLength-partLength, partLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
                     //주데이터
                     TextView tvNo = new TextView(this);
-                LinearLayout.LayoutParams linearLayoutParams =
+                    LinearLayout.LayoutParams linearLayoutParams =
 
-                        new LinearLayout.LayoutParams(
-                                width / 4,
-                                300
+                            new LinearLayout.LayoutParams(
+                                    width / 4,
+                                    300
 
-                        );
+                            );
                     tvNo.setWidth(width / 4);
                     tvNo.setHeight(300);
                     tvNo.setTextSize(textSize);
@@ -304,7 +304,12 @@ public class ActivityMoveCoil extends BaseActivity {
                     }
 
                     tvNo.setTextColor(Color.BLACK);
-                    if (binContent == null) {
+                    if (i % 2 == 1)//홀수행
+                        tvNo.setBackgroundResource(R.drawable.background_tablecell);
+                    else
+                        tvNo.setBackgroundResource(R.drawable.background_table_white);
+
+                    /*if (binContent == null) {
                         tvNo.setBackgroundResource(R.drawable.background_table_white);
                     } else if (binContent.Color.equals("")) {
                         tvNo.setBackgroundResource(R.drawable.background_table_gray);
@@ -318,7 +323,7 @@ public class ActivityMoveCoil extends BaseActivity {
                         tvNo.setBackgroundResource(R.drawable.background_table_lightgreen);
                     } else if (binContent.Color.equals("주황")) {
                         tvNo.setBackgroundResource(R.drawable.background_table_lightsalmon);
-                    }
+                    }*/
                     tvNo.setPadding(10, 15, 0, 15);
                     //tvNo.setGravity(Gravity.CENTER | Gravity.CENTER_VERTICAL);
 

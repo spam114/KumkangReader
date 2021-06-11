@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -48,8 +49,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     FragmentInputCoil fragmentInputCoil;
     FragmentTest fragmentTest;
     FragmentStopOperation fragmentStopOperation;
-
-    ImageView imageView5;//테스트용
+    boolean testFlag=false;
+    ImageView imageView5;
 
     /*Fragment3 fragment3;*/
     ImageView imvQR;
@@ -58,6 +59,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     private final int REQUEST_STOCKOUT = 1;
     private final int REQUEST_COIL_INPUT = 2;
     private final int REQUEST_PRODUCTION = 3;
+    private final int TEST_INT=99;
     public StockOut stockOut;
     /*ArrayList<StockOutDetail> stockOutDetailArrayList;
     ArrayList<StockOutDetail> scanDataArrayList;*/
@@ -66,6 +68,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     TabLayout.Tab secondTab;
     TabLayout.Tab thirdTab;
     TabLayout.Tab fourthTab;
+
+    TextView textView7;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,6 +88,17 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         /* fragment3 = new Fragment3();*/
         tabs = findViewById(R.id.tabs);
         imageView5=findViewById(R.id.imageView5);
+        textView7=findViewById(R.id.textView7);//테스트용
+        textView7.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                testFlag=true;
+                IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity2.this);
+                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
+                intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
+                intentIntegrator.initiateScan();
+            }
+        });
 
         //테스트용
         imageView5.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +121,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     for(int i=0;i<Users.authorityNameList.size();i++){
                         content+=Users.authorityNameList.get(i).toString()+", ";
                     }
-                    content=content.substring(0,content.length()-2);
+                    content=content.substring(0,content.length()-2)+"\n";
+                    content+="작업조: "+Users.WorkClassName;
 
                     adapter.add(content);
 
@@ -295,6 +311,86 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 intentIntegrator.initiateScan();
             }
         });
+
+
+        getWorkClassCode();
+
+    }
+
+    private void getWorkClassCode() {
+        String url = getString(R.string.service_address) + "getWorkClassCode";
+        ContentValues values = new ContentValues();
+        GetWorkClassCode gsod = new GetWorkClassCode(url, values);
+        gsod.execute();
+    }
+
+
+    public class GetWorkClassCode extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetWorkClassCode(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+
+                final CharSequence items[] = new CharSequence[jsonArray.length()];
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    items[i]=child.getString("WorkClassCode")+"-"+child.getString("WorkClassName");
+                }
+
+
+
+                new MaterialAlertDialogBuilder(MainActivity2.this)
+                        .setTitle("작업조를 선택하세요")
+                        .setItems(items, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                String arrSplit[]=items[which].toString().split("-");
+                                Users.WorkClassCode=arrSplit[0];
+                                Users.WorkClassName=arrSplit[1];
+                            }
+                        })
+                        .setCancelable(false)
+                        .show();
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+        }
     }
 
 
@@ -307,6 +403,12 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
    /*         this.stockOutDetailArrayList = new ArrayList<>();
             this.scanDataArrayList = new ArrayList<>();*/
         }
+        if(testFlag){
+            Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
+            testFlag=false;
+            return;
+        }
+
         if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
@@ -668,6 +770,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                             child.getString("InputQty"),
                             child.getString("IssueOutputQty"),
                             child.getString("LocationNo"),
+                            child.getString("ScrappedQty"),
                             child.getString("ScrappedQty")
                     );
 

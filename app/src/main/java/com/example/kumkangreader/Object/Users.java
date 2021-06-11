@@ -28,7 +28,8 @@ public class Users {
     public static float ScreenInches=0;
 
     /**
-     * 주간, 야간, 1교대, 2교대, 3교대
+     * 주간(A), 야간(B), 1교대(C), 2교대(D), 3교대(E)
      */
-    public static String Group = "주간";
+    public static String WorkClassCode = "A";
+    public static String WorkClassName = "주간";
 }
