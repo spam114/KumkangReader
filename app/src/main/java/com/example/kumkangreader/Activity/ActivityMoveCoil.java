@@ -72,7 +72,7 @@ public class ActivityMoveCoil extends BaseActivity {
         this.locationNo = getIntent().getStringExtra("locationNo");
         this.maxRow = Integer.parseInt(getIntent().getStringExtra("maxRow"));
         this.maxCol = Integer.parseInt(getIntent().getStringExtra("maxCol"));
-        this.zone="A";//zone A로 고정
+        this.zone="D";//zone A로 고정
         this.txtSelectedCoil.setText(this.coilNo);
         /*this.maxRow = 12;
         this.maxCol = 4;*/
@@ -397,7 +397,7 @@ public class ActivityMoveCoil extends BaseActivity {
 
                                         @Override
                                         public void onClick(DialogInterface dialog, int which) {
-                                            moveCoil("A", colIndex, rowIndex, coilNo, partCode, partSpec);
+                                            moveCoil("D", colIndex, rowIndex, coilNo, partCode, partSpec);
                                         }
                                     }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override

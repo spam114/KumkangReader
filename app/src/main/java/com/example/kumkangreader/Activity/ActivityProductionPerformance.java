@@ -54,7 +54,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     ImageView imvQR;
     TextInputEditText edtScan;
     String centerSpec;//1번은 코일
-
+    String itemTagForDirect;//바깥쪽에서 실적을 바로잡기위하여 셋팅한 변수
 
     public void startProgress() {
 
@@ -94,9 +94,11 @@ public class ActivityProductionPerformance extends BaseActivity {
         this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
         this.edtScan=findViewById(R.id.edtScan);
         this.centerSpec=this.productionInfoArrayList.get(0).CenterSpec;
+        this.itemTagForDirect = getIntent().getStringExtra("itemTag");
+
 
         this.imvQR = findViewById(R.id.imvQR);
-        getInputData("","");//투입정보 가져오기
+        getInputData("","", this.itemTagForDirect);//투입정보 가져오기
 
         this.imvQR.setOnClickListener(new View.OnClickListener() {//QR클릭 이벤트
             @Override
@@ -175,7 +177,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
 
         if(requestCode==Users.REQUEST_SCRAP){
-            getProductionBasicInfo();
+            getProductionBasicInfo("");
         }
       /*  if (requestCode == REQUEST_STOCKOUT) {//ActivityStockOut에서 돌아옴
         }*/
@@ -195,21 +197,21 @@ public class ActivityProductionPerformance extends BaseActivity {
     }
 
 
-    public void getInputData(String itemTag, String itemTag2) {
+    public void getInputData(String itemTag, String itemTag2, String itemTagForDirect) {
         String url = getString(R.string.service_address) + "getInputData";
         ContentValues values = new ContentValues();
         values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", costCenter);
-        GetInputData gsod = new GetInputData(url, values, itemTag, itemTag2);
+        GetInputData gsod = new GetInputData(url, values, itemTag, itemTag2, itemTagForDirect);
         gsod.execute();
     }
 
-    private void getOutputData(String itemTag) {
+    private void getOutputData(String itemTag, String itemTagForDirect) {
         String url = getString(R.string.service_address) + "getOutputData";
         ContentValues values = new ContentValues();
         values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", costCenter);
-        GetOutputData gsod = new GetOutputData(url, values, itemTag);
+        GetOutputData gsod = new GetOutputData(url, values, itemTag, itemTagForDirect);
         gsod.execute();
     }
 
@@ -233,12 +235,14 @@ public class ActivityProductionPerformance extends BaseActivity {
         ContentValues values;
         String itemTag;
         String itemTag2;
+        String itemTagForDirect;
 
-        GetInputData(String url, ContentValues values, String itemTag, String itemTa2) {
+        GetInputData(String url, ContentValues values, String itemTag, String itemTa2, String itemTagForDirect) {
             this.url = url;
             this.values = values;
             this.itemTag=itemTag;
             this.itemTag2=itemTa2;
+            this.itemTagForDirect=itemTagForDirect;
         }
 
         @Override
@@ -292,7 +296,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 else{
                     inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, this.itemTag, costCenter, mHandler);
                 }
-                getOutputData(itemTag2);//생산정보 가져오기
+                getOutputData(itemTag2, itemTagForDirect);//생산정보 가져오기
                 listViewInput.setAdapter(inputAdapter);
                 //listViewInput.setCacheColorHint(Color.TRANSPARENT);
                 listViewInput.setSelection(inputAdapter.lastPosition);
@@ -312,11 +316,13 @@ public class ActivityProductionPerformance extends BaseActivity {
         String url;
         ContentValues values;
         String itemTag;
+        String itemTagForDirect;
 
-        GetOutputData(String url, ContentValues values, String itemTag) {
+        GetOutputData(String url, ContentValues values, String itemTag, String itemTagForDirect) {
             this.url = url;
             this.values = values;
             this.itemTag=itemTag;
+            this.itemTagForDirect=itemTagForDirect;
         }
 
         @Override
@@ -371,7 +377,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                 listViewOutput.setAdapter(outputAdapter);
                 //listViewOutput.setCacheColorHint(Color.TRANSPARENT);
                 listViewOutput.setSelection(outputAdapter.lastPosition);
-                getProductionBasicInfo();
+                getProductionBasicInfo(itemTagForDirect);
 
 
             } catch (Exception e) {
@@ -388,18 +394,18 @@ public class ActivityProductionPerformance extends BaseActivity {
     public Handler mHandler = new Handler() { //다이얼로그 종료시 액티비티 데이터 전송을 위함
         @Override
         public void handleMessage(Message msg) {
-            getInputData("","");
+            getInputData("","", "");
 
         }
     };
 
 
-    private void getProductionBasicInfo(){
+    private void getProductionBasicInfo(String itemTagForDirect){
         String url=getString(R.string.service_address) + "getProductionBasicInfo";
         ContentValues values = new ContentValues();
         values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", costCenter);
-        GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values);
+        GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values, itemTagForDirect);
         gsod.execute();
     }
 
@@ -407,9 +413,11 @@ public class ActivityProductionPerformance extends BaseActivity {
     public class GetProductionBasicInfo extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        GetProductionBasicInfo(String url, ContentValues values){
+        String itemTagForDirect;
+        GetProductionBasicInfo(String url, ContentValues values, String itemTagForDirect){
             this.url = url;
             this.values = values;
+            this.itemTagForDirect=itemTagForDirect;
         }
         @Override
         protected void onPreExecute() {
@@ -466,6 +474,11 @@ public class ActivityProductionPerformance extends BaseActivity {
                 txtOutputTotal.setText(",   생산: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).IssueOutputQty)) + " / "
                         + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).OutputQty)));
                 txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).ScrappedQty)));
+                
+                
+                if(!itemTagForDirect.equals("")){//바로등록
+                    judgeInputOutput(itemTagForDirect);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -580,6 +593,7 @@ public class ActivityProductionPerformance extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                itemTagForDirect="";
                 progressOFF();
             }
 
@@ -645,7 +659,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                     itemTag=child.getString("ItemTag");
                 }
 
-                getInputData(itemTag,"");
+                getInputData(itemTag,"", "");
                 //1: Input, 2: Output
                /* if (type == 1) {//Input: 투입
                     setInputData();
@@ -726,7 +740,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                     itemTag=child.getString("ItemTag");
                 }
 
-                getInputData("", itemTag);
+                getInputData("", itemTag, "");
 
             } catch (Exception e) {
                 e.printStackTrace();

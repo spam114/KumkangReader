@@ -1,20 +1,79 @@
 package com.example.kumkangreader.Fragment;
 
+import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
+import android.graphics.Color;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Chronometer;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Application.ApplicationClass;
+import com.example.kumkangreader.Interface.BaseActivityInterface;
+import com.example.kumkangreader.Object.CostCenter;
+import com.example.kumkangreader.Object.NonOperationClassCodes;
+import com.example.kumkangreader.Object.NonOperationCodes;
+import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
+import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.textfield.TextInputLayout;
 
-public class FragmentStopOperation extends Fragment {
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+
+public class FragmentStopOperation extends Fragment  implements BaseActivityInterface {
     //TextInputEditText edtScan;
     Context context;
+    Spinner costCenterSpinner;
+    Spinner nonOperationClassCodesSpinner;
+    Spinner nonOperationCodeSpinner;
+    TextView txtState;
+    TextInputLayout menu;
+    LinearLayout layoutCostCenter;
+    LinearLayout layoutClass;
+    LinearLayout layoutClass2;
+    LinearLayout layoutOnlyView;
+    LinearLayout layoutOnlyView2;
+    LinearLayout layoutTime;
+    TextView txtCurrentClass;
+    TextView txtCurrentCode;
+    //TextView txtTest;
+    Chronometer chronometer;
+    Button btnStop;
+    Button btnStart;
+    ArrayList<CostCenter> costCenterArrayList2;
+    ArrayList<NonOperationClassCodes> nonOperationClassCodesArrayList2;
+    ArrayList<NonOperationCodes> nonOperationCodeArrayList2;
+
+    public void startProgress() {
+
+        progressON("Loading...");
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                progressOFF();
+            }
+        }, 3500);
+    }
 
     public FragmentStopOperation(){
 
@@ -28,8 +87,45 @@ public class FragmentStopOperation extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.layout4, container, false);
+        this.costCenterSpinner= rootView.findViewById(R.id.costCenterSpinner);
+        this.nonOperationClassCodesSpinner = rootView.findViewById(R.id.nonOperationClassCodesSpinner);
+        this.nonOperationCodeSpinner=rootView.findViewById(R.id.nonOperationCodeSpinner);
+        this.txtState=rootView.findViewById(R.id.txtState);
+        this.layoutCostCenter=rootView.findViewById(R.id.layoutCostCenter);
+        this.layoutClass=rootView.findViewById(R.id.layoutClass);
+        this.layoutClass2=rootView.findViewById(R.id.layoutClass2);
+        this.layoutOnlyView=rootView.findViewById(R.id.layoutOnlyView);
+        this.layoutOnlyView2=rootView.findViewById(R.id.layoutOnlyView2);
+        this.layoutTime=rootView.findViewById(R.id.layoutTime);
+        this.txtCurrentClass=rootView.findViewById(R.id.txtCurrentClass);
+        this.txtCurrentCode=rootView.findViewById(R.id.txtCurrentCode);
+        //this.txtTest=rootView.findViewById(R.id.txtTest);
+        this.chronometer = rootView.findViewById(R.id.chronometer);
+        this.btnStart=rootView.findViewById(R.id.btnStart);
+        this.btnStop=rootView.findViewById(R.id.btnStop);
 
+        this.btnStart.setOnClickListener(new View.OnClickListener() {//현재 가동상태
+            @Override
+            public void onClick(View v) {
 
+                if(nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCodeName.equals("등록안됨")){
+                    Toast.makeText(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "2",
+                        nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+            }
+        });
+
+        this.btnStop.setOnClickListener(new View.OnClickListener() {//현재 비가동상태
+            @Override
+            public void onClick(View v) {
+                setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "1",
+                        nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+            }
+        });
+
+        getCostCenter();
 
 
       /*  this.edtScan=rootView.findViewById(R.id.edtScan);
@@ -59,5 +155,528 @@ public class FragmentStopOperation extends Fragment {
 
 
         return rootView;
+    }
+
+    public void setCostCenterStopOperations(String costCenter, String currentState, String nonOperationCode) {
+        String url = getString(R.string.service_address) + "setCostCenterStopOperations";
+        ContentValues values = new ContentValues();
+        values.put("CostCenter", costCenter);
+        values.put("CurrentState", currentState);
+        values.put("DayFlag", Users.WorkClassName);
+        values.put("NonOperationCode", nonOperationCode);
+        SetCostCenterStopOperations gsod = new SetCostCenterStopOperations(url, values);
+        gsod.execute();
+    }
+
+    public class SetCostCenterStopOperations extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        SetCostCenterStopOperations(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                CostCenter costCenter;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                String ReturnMessage="";
+                ArrayAdapter<String> costCenterArrayAdapter;
+                final ArrayList<String> costCenterArrayList= new ArrayList<>();
+                costCenterArrayList2= new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    ReturnMessage=child.getString("ReturnMessage");
+
+                    costCenter = new CostCenter();
+                    costCenter.CostCenter = child.getString("CostCenter");
+                    costCenter.CostCenterName = child.getString("CostCenterName");
+                    costCenterArrayList.add(costCenter.CostCenterName);
+                    costCenterArrayList2.add(costCenter);
+                }
+                costCenterArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, costCenterArrayList);
+                costCenterSpinner.setAdapter(costCenterArrayAdapter);
+
+                costCenterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        chronometer.setBase(SystemClock.elapsedRealtime());
+                        chronometer.stop();
+                        getCostCenterStopOperations(costCenterArrayList2.get(position).CostCenter);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                Toast.makeText(context, ReturnMessage, Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+        }
+    }
+
+
+
+    public void getCostCenter() {
+        String url = getString(R.string.service_address) + "getCostCenter";
+        ContentValues values = new ContentValues();
+        //values.put("WorksOrderNo", worksOrderNo);
+        //values.put("CostCenter", costCenter);
+        GetCostCenter gsod = new GetCostCenter(url, values);
+        gsod.execute();
+    }
+
+    public class GetCostCenter extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetCostCenter(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                CostCenter costCenter;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                ArrayAdapter<String> costCenterArrayAdapter;
+                final ArrayList<String> costCenterArrayList= new ArrayList<>();
+                costCenterArrayList2= new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    costCenter = new CostCenter();
+                    costCenter.CostCenter = child.getString("CostCenter");
+                    costCenter.CostCenterName = child.getString("CostCenterName");
+                    costCenterArrayList.add(costCenter.CostCenterName);
+                    costCenterArrayList2.add(costCenter);
+                }
+                costCenterArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, costCenterArrayList);
+                costCenterSpinner.setAdapter(costCenterArrayAdapter);
+
+                costCenterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+                        chronometer.setBase(SystemClock.elapsedRealtime());
+                        chronometer.stop();
+                        getCostCenterStopOperations(costCenterArrayList2.get(position).CostCenter);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+        }
+    }
+
+
+    public void getCostCenterStopOperations(String costCenter) {
+        String url = getString(R.string.service_address) + "getCostCenterStopOperations";
+        ContentValues values = new ContentValues();
+        //values.put("WorksOrderNo", worksOrderNo);
+        values.put("CostCenter", costCenter);
+        GetCostCenterStopOperations gsod = new GetCostCenterStopOperations(url, values, costCenter);
+        gsod.execute();
+    }
+
+
+    public class GetCostCenterStopOperations extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        String costCenter;
+
+        GetCostCenterStopOperations(String url, ContentValues values, String costCenter) {
+            this.url = url;
+            this.values = values;
+            this.costCenter=costCenter;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                if(jsonArray.length()==0){//데이터가 없으면 가동상태
+                    txtState.setText("가동");
+                    txtState.setTextColor(Color.BLUE);
+                    layoutClass.setVisibility(View.VISIBLE);
+                    layoutClass2.setVisibility(View.VISIBLE);
+                    layoutOnlyView.setVisibility(View.GONE);
+                    layoutOnlyView2.setVisibility(View.GONE);
+                    layoutTime.setVisibility(View.GONE);
+                    btnStart.setVisibility(View.VISIBLE);
+                    //.setVisibility(View.VISIBLE);
+                    getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
+                    return;
+                }
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    if (!child.getString("EndTime").equals("")) {//EndTime에 데이터가 들어있다-> 가동상태
+                        txtState.setText("가동");
+                        txtState.setTextColor(Color.BLUE);
+                        layoutClass.setVisibility(View.VISIBLE);
+                        layoutClass2.setVisibility(View.VISIBLE);
+                        layoutOnlyView.setVisibility(View.GONE);
+                        layoutOnlyView2.setVisibility(View.GONE);
+                        layoutTime.setVisibility(View.GONE);
+                        btnStart.setVisibility(View.VISIBLE);
+                        //layoutCostCenter.setVisibility(View.VISIBLE);
+                        getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
+                        return;
+                    }
+                    boolean running;
+                    long pauseOffset;
+
+                    txtState.setText("비가동");
+                    //txtState.setText(Long.toString(SystemClock.elapsedRealtime()));
+                    txtState.setTextColor(Color.RED);
+                    layoutClass.setVisibility(View.GONE);
+                    layoutClass2.setVisibility(View.GONE);
+                    layoutOnlyView.setVisibility(View.VISIBLE);
+                    layoutOnlyView2.setVisibility(View.VISIBLE);
+                    layoutTime.setVisibility(View.VISIBLE);
+                    txtCurrentClass.setText(child.getString("NonOperationClassCodeName"));
+                    txtCurrentCode.setText(child.getString("NonOperationCodeName"));
+                    btnStart.setVisibility(View.GONE);
+                    getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
+
+                    getNonOperationCodes(child.getString("NonOperationClassCode"), costCenter);
+
+                    chronometer.setFormat("%s");
+
+                    chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener(){
+                        @Override
+                        public void onChronometerTick(Chronometer cArg) {
+                            long time = SystemClock.elapsedRealtime() - cArg.getBase();
+                            int h   = (int)(time /3600000);
+                            int m = (int)(time - h*3600000)/60000;
+                            int s= (int)(time - h*3600000- m*60000)/1000 ;
+                            String hh = h < 10 ? "0"+h: h+"";
+                            String mm = m < 10 ? "0"+m: m+"";
+                            String ss = s < 10 ? "0"+s: s+"";
+                            cArg.setText(hh+":"+mm+":"+ss);
+                        }
+                    });
+                    long diffTime=Long.parseLong(child.getString("DiffTime"));
+
+                  /*  SimpleDateFormat dayTime = new SimpleDateFormat("yyyy-MM-dd a hh:mm:ss.SS");
+                    long reqTime = System.currentTimeMillis();
+                    String reqTimeStr = dayTime.format(new Date(reqTime));//현재시간*/
+
+
+                    //long resTime =
+                   // String resTimeStr = dayTime.format(resTime);
+
+                    chronometer.setBase(SystemClock.elapsedRealtime() - (diffTime));
+                    chronometer.start();
+
+                    //txtTest.setText(child.getString("StartTime"));
+                    //layoutCostCenter.setVisibility(View.GONE);
+                    return;
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+    public void getNonOperationClassCodes(String costCenter) {
+        String url = getString(R.string.service_address) + "getNonOperationClassCodes";
+        ContentValues values = new ContentValues();
+        GetNonOperationClassCodes gsod = new GetNonOperationClassCodes(url, values, costCenter);
+        gsod.execute();
+    }
+
+    public class GetNonOperationClassCodes extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        String costCenter;
+
+        GetNonOperationClassCodes(String url, ContentValues values, String costCenter) {
+            this.costCenter=costCenter;
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                NonOperationClassCodes nonOperationClassCodes;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                ArrayAdapter<String> nonOperationClassCodesArrayAdapter;
+                final ArrayList<String> nonOperationClassCodesArrayList= new ArrayList<>();
+                nonOperationClassCodesArrayList2= new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    nonOperationClassCodes = new NonOperationClassCodes();
+                    nonOperationClassCodes.NonOperationClassCode = child.getString("NonOperationClassCode");
+                    nonOperationClassCodes.NonOperationClassCodeName = child.getString("NonOperationClassCodeName");
+                    nonOperationClassCodesArrayList.add(nonOperationClassCodes.NonOperationClassCodeName);
+                    nonOperationClassCodesArrayList2.add(nonOperationClassCodes);
+                }
+                nonOperationClassCodesArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, nonOperationClassCodesArrayList);
+                nonOperationClassCodesSpinner.setAdapter(nonOperationClassCodesArrayAdapter);
+
+                nonOperationClassCodesSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //getCostCenterStopOperations(nonOperationClassCodesArrayList2.get(position).NonOperationClassCode);
+                        getNonOperationCodes(nonOperationClassCodesArrayList2.get(position).NonOperationClassCode ,costCenter);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+
+                /*editTextFilledExposedDropdown.setAdapter(costCenterArrayAdapter);
+
+                editTextFilledExposedDropdown.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        menu.setHint("");
+                        editTextFilledExposedDropdown.setTextColor(Color.BLACK);
+
+
+                    }
+                });*/
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+    public void getNonOperationCodes(String nonOperationClassCode ,String costCenter) {
+        String url = getString(R.string.service_address) + "getNonOperationCodes";
+        ContentValues values = new ContentValues();
+        values.put("NonOperationClassCode", nonOperationClassCode);
+        values.put("CostCenter", costCenter);
+        GetNonOperationCodes gsod = new GetNonOperationCodes(url, values);
+        gsod.execute();
+    }
+
+
+    public class GetNonOperationCodes extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetNonOperationCodes(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                ArrayAdapter<String> nonOperationCodeArrayAdapter;
+                NonOperationCodes nonOperationCodes;
+                final ArrayList<String> nonOperationCodeArrayList= new ArrayList<>();
+                nonOperationCodeArrayList2= new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    nonOperationCodes=new NonOperationCodes();
+                    nonOperationCodes.NonOperationCode=child.getString("NonOperationCode");
+                    nonOperationCodes.NonOperationCodeName=child.getString("NonOperationCodeName");
+
+                    nonOperationCodeArrayList.add(nonOperationCodes.NonOperationCodeName);
+                    nonOperationCodeArrayList2.add(nonOperationCodes);
+                }
+                nonOperationCodeArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, nonOperationCodeArrayList);
+                nonOperationCodeSpinner.setAdapter(nonOperationCodeArrayAdapter);
+
+                nonOperationCodeSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                    @Override
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        //getCostCenterStopOperations(costCenterArrayList2.get(position).CostCenter);
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+        }
+    }
+
+
+    @Override
+    public int checkTagState(String tag) {
+        return 0;
+    }
+
+    @Override
+    public void progressON() {
+        ApplicationClass.getInstance().progressON((Activity)getContext(), null);
+    }
+
+    @Override
+    public void progressON(String message) {
+        ApplicationClass.getInstance().progressON((Activity)getContext(), message);
+    }
+
+    @Override
+    public void progressOFF() {
+        ApplicationClass.getInstance().progressOFF();
+    }
+
+
+    public void onDestroy(){
+
+        super.onDestroy();
+        chronometer.setBase(SystemClock.elapsedRealtime());
+        chronometer.stop();
+
     }
 }

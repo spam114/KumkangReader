@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <uses-permission android:name="android.permission.READ_PHONE_STATE"/>
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" /><!--오레오 버전 부터 추가된  설치 권한-->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/><!--오레오 버전 부터 추가된  설치 권한-->
     <uses-permission android:name="android.permission.BLUETOOTH"/><!--핸드폰정보 이름 설정값을 알아오기위한 블루투스 권한-->
     <application
         android:name="com.example.kumkangreader.Application.ApplicationClass"
@@ -22,58 +22,73 @@
         >
         <activity
             android:name=".Activity.SplashScreenActivity"
-            tools:ignore="LockedOrientationActivity">
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+
         </activity>
 
         <activity android:name=".MainActivity"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             >
         </activity>
         <activity android:name="com.example.kumkangreader.QRCode.QRReaderActivityStockOutMaster"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
         <activity android:name="com.example.kumkangreader.Activity.ActivityStockOut"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name="com.example.kumkangreader.Activity.LoginActivity"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name="com.example.kumkangreader.Activity.RegisterActivity"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name="com.example.kumkangreader.MainActivity2"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
         <activity android:name=".Activity.ActivityProductionPerformance"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name=".Activity.Activity_test"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name=".Activity.ActivityMoveCoil"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name=".Activity.ActivityMoveCoil2"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name=".Activity.ActivityScrap"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <activity android:name=".Activity.ActivityStockOutNew"
             tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
             />
 
         <provider

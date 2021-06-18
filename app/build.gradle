@@ -5,9 +5,10 @@ android {
     defaultConfig {
         applicationId "com.example.kumkangreader"
         minSdkVersion 19
+        //noinspection ExpiredTargetSdkVersion
         targetSdkVersion 26
-        versionCode 7
-        versionName "7.0"
+        versionCode 5
+        versionName "5.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

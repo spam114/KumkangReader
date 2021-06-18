@@ -89,7 +89,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         tabs = findViewById(R.id.tabs);
         imageView5=findViewById(R.id.imageView5);
         textView7=findViewById(R.id.textView7);//테스트용
-        textView7.setOnClickListener(new View.OnClickListener() {
+      /*  textView7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 testFlag=true;
@@ -98,7 +98,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
                 intentIntegrator.initiateScan();
             }
-        });
+        });*/
 
         //테스트용
         imageView5.setOnClickListener(new View.OnClickListener() {
@@ -313,85 +313,14 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         });
 
 
-        getWorkClassCode();
+
 
     }
 
-    private void getWorkClassCode() {
-        String url = getString(R.string.service_address) + "getWorkClassCode";
-        ContentValues values = new ContentValues();
-        GetWorkClassCode gsod = new GetWorkClassCode(url, values);
-        gsod.execute();
-    }
-
-
-    public class GetWorkClassCode extends AsyncTask<Void, Void, String> {
-        String url;
-        ContentValues values;
-
-        GetWorkClassCode(String url, ContentValues values) {
-            this.url = url;
-            this.values = values;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //progress bar를 보여주는 등등의 행위
-            startProgress();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String result;
-            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
-            result = requestHttpURLConnection.request(url, values);
-            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // 통신이 완료되면 호출됩니다.
-            // 결과에 따른 UI 수정 등은 여기서 합니다
-
-            try {
-                JSONArray jsonArray = new JSONArray(result);
-                String ErrorCheck = "";
-
-                final CharSequence items[] = new CharSequence[jsonArray.length()];
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject child = jsonArray.getJSONObject(i);
-                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
-                        ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    items[i]=child.getString("WorkClassCode")+"-"+child.getString("WorkClassName");
-                }
 
 
 
-                new MaterialAlertDialogBuilder(MainActivity2.this)
-                        .setTitle("작업조를 선택하세요")
-                        .setItems(items, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                String arrSplit[]=items[which].toString().split("-");
-                                Users.WorkClassCode=arrSplit[0];
-                                Users.WorkClassName=arrSplit[1];
-                            }
-                        })
-                        .setCancelable(false)
-                        .show();
 
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                progressOFF();
-            }
-        }
-    }
 
 
     @Override
@@ -419,7 +348,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     inputCoil(scanResult);
                 } else if (secondTab.isSelected()) {//생산실적
                     try {
-                        getProductionBasicInfo(scanResult);
+                        getProductionBasicInfo(scanResult,"");
                     } catch (ArrayIndexOutOfBoundsException aoe) {
                         Toast.makeText(this, "올바른 발주서 태그가 아닙니다.", Toast.LENGTH_SHORT).show();
                     }
@@ -439,7 +368,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         values.put("CoilNo", scanResult);
         values.put("BusinessClassCode", "2");
         values.put("UserCode", Users.PhoneNumber);
-        values.put("Zone", "A");//일단 A로고정
+        values.put("Zone", "D");//일단 A로고정
         InputCoil gsod = new InputCoil(url, values);
         gsod.execute();
     }
@@ -451,7 +380,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         String url = getString(R.string.service_address) + "getMaxLengthTable";
         ContentValues values = new ContentValues();
         values.put("BusinessClassCode", "2");
-        values.put("Zone", "A");//일단 A로고정
+        values.put("Zone", "D");//일단 A로고정
         GetMaxLengthTable gsod = new GetMaxLengthTable(url, values);
         gsod.execute();
     }
@@ -704,7 +633,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
 
 
-    public void getProductionBasicInfo(String scanResult){
+    public void getProductionBasicInfo(String scanResult, String itemTag){
         String[] array = scanResult.split("/");
         String worksOrderNo = array[0];
         String costCenter = array[1];
@@ -712,17 +641,19 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         ContentValues values = new ContentValues();
         values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", costCenter);
-        GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values);
+        GetProductionBasicInfo gsod = new GetProductionBasicInfo(url, values, itemTag);
         gsod.execute();
     }
 
     public class GetProductionBasicInfo extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
+        String itemTag;
 
-        GetProductionBasicInfo(String url, ContentValues values) {
+        GetProductionBasicInfo(String url, ContentValues values, String itemTag) {
             this.url = url;
             this.values = values;
+            this.itemTag=itemTag;
         }
 
         @Override
@@ -793,6 +724,9 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 i.putExtra("costCenter", costCenter);
                 i.putExtra("costCenterName", costCenterName);
                 i.putExtra("locationNo", locationNo);
+                i.putExtra("itemTag", itemTag);
+
+
                 startActivityForResult(i, REQUEST_PRODUCTION);
 
             } catch (Exception e) {

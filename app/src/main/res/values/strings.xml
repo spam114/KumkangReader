@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">QR코드시스템(언양)</string>
+    <string name="app_name">금강공업 언양공장</string>
     <string name="qr_state_stockoutmaster">상차태그를 인식해주세요.</string>
     <string name="qr_state_coil_input">코일태그를 인식해주세요.</string>
     <string name="qr_state_production">발주서태그를 인식해주세요.</string>

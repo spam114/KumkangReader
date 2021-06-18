@@ -32,4 +32,7 @@ public class Users {
      */
     public static String WorkClassCode = "A";
     public static String WorkClassName = "주간";
+
+    //true면 비가동상태
+    //public static boolean CostCenterStopOperationStatus=true;
 }

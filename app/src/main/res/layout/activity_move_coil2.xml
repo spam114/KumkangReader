@@ -17,7 +17,7 @@
             android:layout_marginLeft="10dp"
             android:layout_marginTop="10dp"
             android:layout_marginBottom="10dp"
-            android:text="코일 위치관리 (구역 A)"
+            android:text="코일 위치관리 (구역 D)"
             android:textSize="13sp" />
 
         <LinearLayout

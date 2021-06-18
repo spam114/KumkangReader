@@ -36,8 +36,10 @@ import com.example.kumkangreader.BuildConfig;
 import com.example.kumkangreader.Constants;
 import com.example.kumkangreader.MainActivity2;
 import com.example.kumkangreader.Object.Users;
+import com.example.kumkangreader.Object.WorkClass;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -243,10 +245,10 @@ public class SplashScreenActivity extends BaseActivity {
                     if (Double.parseDouble(serverVersion) > getCurrentVersion()) {//좌측이 DB에 있는 버전
                         newVersionDownload();
                     } else {
-                        // finish();
+                        CheckPermission();
                     }
                 }
-                CheckPermission();
+
             } catch (Exception er) {
 
             } finally {
@@ -331,7 +333,7 @@ public class SplashScreenActivity extends BaseActivity {
         }*/
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {//누가 버전 이상이라면 FileProvider를 사용한다.
-            Toast.makeText(getBaseContext(), "test1", Toast.LENGTH_LONG).show();
+            //Toast.makeText(getBaseContext(), "test1", Toast.LENGTH_LONG).show();
             uri = uri.substring(7);
             File file = new File(uri);
             Uri u = FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".provider", file);
@@ -514,10 +516,109 @@ public class SplashScreenActivity extends BaseActivity {
                         Users.authorityNameList.add(child.getString("AuthorityName"));
                     }
                     Intent Intent = new Intent(SplashScreenActivity.this, MainActivity2.class);
-                    startActivity(Intent);
+
+                    getWorkClassCode(Intent);
                     return;
 
                 }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+        }
+    }
+
+    private void getWorkClassCode(Intent intent) {
+        String url = getString(R.string.service_address) + "getWorkClassCode";
+        ContentValues values = new ContentValues();
+        GetWorkClassCode gsod = new GetWorkClassCode(url, values, intent);
+        gsod.execute();
+    }
+
+    public class GetWorkClassCode extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        Intent intent;
+
+        GetWorkClassCode(String url, ContentValues values, Intent intent) {
+            this.url = url;
+            this.values = values;
+            this.intent=intent;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            startProgress();
+            //progress bar를 보여주는 등등의 행위
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+
+                final ArrayList<WorkClass> workClassArrayList=new ArrayList<>();
+                final CharSequence[] workClassSequences= new CharSequence[jsonArray.length()];
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    WorkClass workClass=new WorkClass();
+                    workClass.WorkClassCode = child.getString("WorkClassCode");
+                    workClass.WorkClassName = child.getString("WorkClassName");
+                    workClassSequences[i]=child.getString("WorkClassName");
+                    workClassArrayList.add(workClass);
+                }
+
+
+                /*WorkClassDialog sdd = new WorkClassDialog(SplashScreenActivity.this, workClassArrayList);
+                sdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+                sdd.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
+                sdd.show();*/
+
+
+                new MaterialAlertDialogBuilder(SplashScreenActivity.this)
+                        .setTitle("작업조를 선택하세요")
+                        .setSingleChoiceItems(workClassSequences, 0, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                Users.WorkClassCode=workClassArrayList.get(which).WorkClassCode;
+                                Users.WorkClassName=workClassArrayList.get(which).WorkClassName;
+                            }
+                        })
+                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                            @Override
+                            public void onDismiss(DialogInterface dialog) {
+                                startActivity(intent);
+                            }
+                        })
+                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                dialog.dismiss();
+                            }
+                        })
+                        .show();
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
