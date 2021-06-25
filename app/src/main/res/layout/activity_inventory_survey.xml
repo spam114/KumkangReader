@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:weightSum="10">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.2"
+        android:orientation="horizontal"
+        android:weightSum="10">
+
+        <Spinner
+            android:id="@+id/spinnerZone"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+
+        <Spinner
+            android:id="@+id/spinnerZoneSeqNo"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4"
+            android:gravity="right"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:id="@+id/imvQR"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:adjustViewBounds="true"
+                android:paddingTop="5dp"
+                android:paddingRight="5dp"
+                app:srcCompat="@drawable/baseline_qr_code_scanner_black_48dp" />
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="0.5"
+        android:background="#6E6E73"
+        android:orientation="horizontal"
+        android:weightSum="15">
+
+        <TextView
+            android:id="@+id/txtCoil3"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="2"
+            android:gravity="center"
+            android:text="NO"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/txtCoil"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4.8"
+            android:gravity="center"
+            android:text="TAG번호"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/txtPart"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="4.8"
+            android:gravity="center"
+            android:text="품명/규격"
+            android:textColor="#FFFFFF" />
+
+        <TextView
+            android:id="@+id/txtQty"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3.4"
+            android:gravity="center"
+            android:text="수량"
+            android:textColor="#FFFFFF" />
+
+    </LinearLayout>
+
+    <ListView
+        android:id="@+id/listViewInventory"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8.3"
+        android:background="@drawable/borderline" />
+</LinearLayout>

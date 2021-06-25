@@ -12,7 +12,7 @@
         android:id="@+id/layoutTop"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1.2"
+        android:layout_weight="1.3"
         android:background="@drawable/borderline"
         android:gravity="center|left"
         android:orientation="horizontal"
@@ -40,7 +40,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
                         android:layout_marginLeft="10dp"
-                        android:layout_marginTop="10dp"
+                        android:layout_marginTop="5dp"
                         android:orientation="vertical">
 
                         <LinearLayout
@@ -58,6 +58,13 @@
 
                         </LinearLayout>
 
+                        <TextView
+                            android:id="@+id/txtRepresent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="대표품목"
+                            android:textColor="#000000" />
+
                         <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
@@ -67,20 +74,30 @@
                                 android:id="@+id/txtInputTotal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="총투입" />
+                                android:text="총투입"
+                                android:textColor="#000000" />
 
                             <TextView
                                 android:id="@+id/txtOutputTotal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="총생산" />
+                                android:text="총생산"
+                                android:textColor="#000000" />
+
                         </LinearLayout>
 
-                        <TextView
-                            android:id="@+id/txtScrappedQty"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="불량수량" />
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/txtScrappedQty"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="불량수량"
+                                android:textColor="#000000" />
+                        </LinearLayout>
 
                     </LinearLayout>
                 </androidx.cardview.widget.CardView>
@@ -130,7 +147,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4.15"
+        android:layout_weight="4.1"
         android:background="@drawable/borderline"
         android:orientation="vertical"
         android:weightSum="10">
@@ -163,10 +180,19 @@
             android:weightSum="15">
 
             <TextView
+                android:id="@+id/txtCoil3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:text="NO"
+                android:textColor="#FFFFFF" />
+
+            <TextView
                 android:id="@+id/txtCoil"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5.5"
+                android:layout_weight="5"
                 android:gravity="center"
                 android:text="TAG/코일 번호"
                 android:textColor="#FFFFFF" />
@@ -175,7 +201,7 @@
                 android:id="@+id/txtPart"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5.5"
+                android:layout_weight="5"
                 android:gravity="center"
                 android:text="품명/규격"
                 android:textColor="#FFFFFF" />
@@ -184,7 +210,7 @@
                 android:id="@+id/txtQty"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="4"
+                android:layout_weight="3.5"
                 android:gravity="center"
                 android:text="수량"
                 android:textColor="#FFFFFF" />
@@ -202,7 +228,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4.15"
+        android:layout_weight="4.1"
         android:orientation="vertical"
         android:weightSum="10">
 
@@ -234,10 +260,19 @@
             android:weightSum="15">
 
             <TextView
+                android:id="@+id/txtCoil5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1.5"
+                android:gravity="center"
+                android:text="NO"
+                android:textColor="#FFFFFF" />
+
+            <TextView
                 android:id="@+id/txtCoil2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5.5"
+                android:layout_weight="5"
                 android:gravity="center"
                 android:text="TAG/코일 번호"
                 android:textColor="#FFFFFF" />
@@ -246,7 +281,7 @@
                 android:id="@+id/txtPart2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="5.5"
+                android:layout_weight="5"
                 android:gravity="center"
                 android:text="품명/규격"
                 android:textColor="#FFFFFF" />
@@ -255,7 +290,7 @@
                 android:id="@+id/txtQty2"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_weight="4"
+                android:layout_weight="3.5"
                 android:gravity="center"
                 android:text="수량(불량)"
                 android:textColor="#FFFFFF" />

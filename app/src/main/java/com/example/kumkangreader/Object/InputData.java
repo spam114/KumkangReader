@@ -13,6 +13,7 @@ public class InputData implements Serializable {
     public String MSpec;
     public String Qty;
     public String UseFlag;
+    public String SeqNo;
 
     public InputData(
              String ItemTag,
@@ -23,7 +24,8 @@ public class InputData implements Serializable {
              String PartSpecName,
              String MSpec,
              String Qty,
-             String UseFlag
+             String UseFlag,
+             String SeqNo
     ){
         this.ItemTag=ItemTag;
         this.CoilNo=CoilNo;
@@ -34,5 +36,6 @@ public class InputData implements Serializable {
         this.MSpec=MSpec;
         this.Qty=Qty;
         this.UseFlag=UseFlag;
+        this.SeqNo=SeqNo;
     }
 }

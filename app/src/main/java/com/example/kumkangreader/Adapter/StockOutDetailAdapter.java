@@ -92,6 +92,11 @@ public class StockOutDetailAdapter extends ArrayAdapter<StockOutDetail> implemen
                 layoutQty.setBackgroundColor(Color.YELLOW);
                 this.lastPosition = position;
             }
+            else{
+                textViewPartName.setBackgroundColor(Color.TRANSPARENT);
+                textViewPartSpecName.setBackgroundColor(Color.TRANSPARENT);
+                layoutQty.setBackgroundColor(Color.TRANSPARENT);
+            }
 
             row.setOnClickListener(new View.OnClickListener() {
                 @Override

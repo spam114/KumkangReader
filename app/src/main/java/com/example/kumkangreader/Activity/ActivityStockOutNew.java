@@ -453,6 +453,8 @@ public class ActivityStockOutNew extends BaseActivity{
 
                 instructionAdapter= new StockOutDetailAdapter(ActivityStockOutNew.this, R.layout.listview_stockout_detail_row, stockOutDetailArrayList, lastPart, stockOut.StockOutNo);
                 listViewStockOut.setAdapter(instructionAdapter);
+                listViewStockOut.setSelection(stockOutDetailArrayList.size()-1);
+
                 //listViewStockOut.setSelection(instructionAdapter.lastPosition);
 
                 /*if(mode==2)

@@ -16,7 +16,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.kumkangreader.Activity.ActivityMoveCoil;
+import com.example.kumkangreader.Activity.ActivityInventorySurvey;
 import com.example.kumkangreader.Activity.ActivityMoveCoil2;
 import com.example.kumkangreader.Activity.ActivityProductionPerformance;
 import com.example.kumkangreader.Activity.ActivityStockOutNew;
@@ -89,16 +89,20 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         tabs = findViewById(R.id.tabs);
         imageView5=findViewById(R.id.imageView5);
         textView7=findViewById(R.id.textView7);//테스트용
-      /*  textView7.setOnClickListener(new View.OnClickListener() {
+
+        if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
+            textView7.setText(" 재고조사(선택)");
+        }
+
+        textView7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                testFlag=true;
-                IntentIntegrator intentIntegrator = new IntentIntegrator(MainActivity2.this);
-                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
-                intentIntegrator.setPrompt(getString(R.string.qr_state_stockoutmaster));
-                intentIntegrator.initiateScan();
+                if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
+                    Intent i = new Intent(getBaseContext(), ActivityInventorySurvey.class);
+                    startActivity(i);
+                }
             }
-        });*/
+        });
 
         //테스트용
         imageView5.setOnClickListener(new View.OnClickListener() {
@@ -346,11 +350,16 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 scanResult = result.getContents();
                 if (firstTab.isSelected()) {//코일입고
                     inputCoil(scanResult);
-                } else if (secondTab.isSelected()) {//생산실적
+                } else if (secondTab.isSelected()) {
+                    //생산실적
                     try {
-                        getProductionBasicInfo(scanResult,"");
+                        judgeItemTagOrWorksOrder(scanResult);
                     } catch (ArrayIndexOutOfBoundsException aoe) {
-                        Toast.makeText(this, "올바른 발주서 태그가 아닙니다.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "사용 불가능한 TAG 입니다.", Toast.LENGTH_SHORT).show();
+                        progressOFF();
+                    }
+                    finally {
+
                     }
                 } else {//출고등록
                     //fragmentStockOut.callGetStockOutMaster(scanResult); //과거버전
@@ -362,28 +371,95 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         }
     }
 
+
+    /**
+     * 바로 실적 등록 가능한 태그임을 판별한다. 아닐 시, 작지 태그로 간주 후 처리
+     * 바로 실적 등록 가능한 태그 : 1
+     * 아닌 경우 : 2
+     * @param scanResult
+     */
+    public void judgeItemTagOrWorksOrder(String scanResult){
+        String url=getString(R.string.service_address) + "judgeItemTagOrWorksOrder";
+        ContentValues values = new ContentValues();
+        values.put("ScanInput", scanResult);
+        JudgeItemTagOrWorksOrder gsom = new JudgeItemTagOrWorksOrder(url, values, scanResult);
+        gsom.execute();
+    }
+
+    public class JudgeItemTagOrWorksOrder extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+        String scanResult;
+        JudgeItemTagOrWorksOrder(String url, ContentValues values, String scanResult){
+            this.url = url;
+            this.values = values;
+            this.scanResult=scanResult;
+        }
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등의 행위
+            startProgress();
+        }
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+            try {
+                //Log.i("ReadJSONFeedTask", result);
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                String type="";
+
+                JSONObject child = jsonArray.getJSONObject(0);
+
+                if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                    ErrorCheck = child.getString("ErrorCheck");
+                    Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                type = child.getString("Type");
+
+                if(type.equals("1")){
+                    getProductionBasicInfo(child.getString("WorksOrderNo")+"/"+child.getString("CostCenter"), child.getString("ItemTag"));
+                }
+                else{
+                    getProductionBasicInfo(scanResult, "");
+                }
+            }
+            catch (ArrayIndexOutOfBoundsException aoe){
+                Toast.makeText(MainActivity2.this, "사용 불가능한 TAG 입니다.", Toast.LENGTH_SHORT).show();
+            }
+            catch (Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                progressOFF();
+            }
+
+        }
+    }
+
+
     public void inputCoil(String scanResult){
         String url = getString(R.string.service_address) + "inputCoil";
         ContentValues values = new ContentValues();
         values.put("CoilNo", scanResult);
         values.put("BusinessClassCode", "2");
         values.put("UserCode", Users.PhoneNumber);
-        values.put("Zone", "D");//일단 A로고정
+        values.put("Zone", "A");//초기화면 zone A
         InputCoil gsod = new InputCoil(url, values);
         gsod.execute();
     }
 
-    /**
-     * 존별 테이블의 가로 세로 최대값을 가져온후, 태그이동 액티비티로 이동
-     */
-    public void getMaxLengthTable(){
-        String url = getString(R.string.service_address) + "getMaxLengthTable";
-        ContentValues values = new ContentValues();
-        values.put("BusinessClassCode", "2");
-        values.put("Zone", "D");//일단 A로고정
-        GetMaxLengthTable gsod = new GetMaxLengthTable(url, values);
-        gsod.execute();
-    }
+
 
     public void getStockOutMaster(String scanResult){
         String url=getString(R.string.service_address) + "getStockOutMaster";
@@ -546,13 +622,10 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     return;
                 }
 
-                Intent i = new Intent(getBaseContext(), ActivityMoveCoil.class);
+                Intent i = new Intent(getBaseContext(), ActivityMoveCoil2.class);
                 i.putExtra("coilNo", coilNo);
                 i.putExtra("partCode", partCode);
                 i.putExtra("partSpec", partSpec);
-                i.putExtra("locationNo", locationNo);
-                i.putExtra("maxRow", maxRow);
-                i.putExtra("maxCol", maxCol);
                 startActivity(i);
 
                 Toast.makeText(getBaseContext(), "코일 입고가 완료되었습니다.\n적재위치를 선택하여 주세요.", Toast.LENGTH_LONG).show();
@@ -565,70 +638,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         }
     }
 
-    public class GetMaxLengthTable extends AsyncTask<Void, Void, String> {
-        String url;
-        ContentValues values;
 
-        GetMaxLengthTable(String url, ContentValues values) {
-            this.url = url;
-            this.values = values;
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            //progress bar를 보여주는 등등의 행위
-            startProgress();
-        }
-
-        @Override
-        protected String doInBackground(Void... params) {
-            String result;
-            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
-            result = requestHttpURLConnection.request(url, values);
-            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
-        }
-
-        @Override
-        protected void onPostExecute(String result) {
-            // 통신이 완료되면 호출됩니다.
-            // 결과에 따른 UI 수정 등은 여기서 합니다
-
-            try {
-                JSONArray jsonArray = new JSONArray(result);
-                String ErrorCheck = "";
-
-                String locationNo="";
-                String maxRow="";
-                String maxCol="";
-
-                for (int i = 0; i < jsonArray.length(); i++) {
-                    JSONObject child = jsonArray.getJSONObject(i);
-                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
-                        ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-
-                    locationNo = child.getString("LocationNo");
-                    maxRow = child.getString("MaxRow");
-                    maxCol = child.getString("MaxCol");
-                }
-
-                Intent i = new Intent(getBaseContext(), ActivityMoveCoil2.class);
-
-                i.putExtra("locationNo", locationNo);
-                i.putExtra("maxRow", maxRow);
-                i.putExtra("maxCol", maxCol);
-                startActivity(i);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                progressOFF();
-            }
-
-        }
-    }
 
 
 
@@ -702,7 +712,9 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                             child.getString("IssueOutputQty"),
                             child.getString("LocationNo"),
                             child.getString("ScrappedQty"),
-                            child.getString("ScrappedQty")
+                            child.getString("CenterSpec"),
+                            child.getString("PartName"),
+                            child.getString("PartSpecName")
                     );
 
                     productionInfoArrayList.add(productionInfo);
@@ -726,7 +738,6 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 i.putExtra("locationNo", locationNo);
                 i.putExtra("itemTag", itemTag);
 
-
                 startActivityForResult(i, REQUEST_PRODUCTION);
 
             } catch (Exception e) {
@@ -737,7 +748,6 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
         }
     }
-
 
     @Override
     public int checkTagState(String tag) {

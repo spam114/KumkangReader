@@ -222,6 +222,33 @@
             android:text="비가동 시작"
             android:textSize="18sp" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="40dp"
+            android:layout_marginRight="40dp"
+            android:orientation="horizontal"
+            android:weightSum="10">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnKeyIn"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginRight="5dp"
+                android:layout_weight="5"
+                android:text="직접입력"
+                android:textSize="18sp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/btnSearch"
+                android:layout_width="0dp"
+                android:layout_height="80dp"
+                android:layout_marginLeft="5dp"
+                android:layout_weight="5"
+                android:text="내역조회"
+                android:textSize="18sp" />
+
+        </LinearLayout>
 
 
     </LinearLayout>

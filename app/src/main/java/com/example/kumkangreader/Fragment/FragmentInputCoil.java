@@ -1,6 +1,7 @@
 package com.example.kumkangreader.Fragment;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -15,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Activity.ActivityMoveCoil2;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.MainActivity2;
 import com.example.kumkangreader.R;
@@ -63,7 +65,13 @@ public class FragmentInputCoil extends Fragment implements BaseActivityInterface
         this.btnMoveCoil.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ((MainActivity2)(context)).getMaxLengthTable();
+
+                Intent i = new Intent(context, ActivityMoveCoil2.class);
+
+                i.putExtra("coilNo", "");
+                i.putExtra("partCode", "");
+                i.putExtra("partSpec", "");
+                startActivity(i);
             }
         });
 

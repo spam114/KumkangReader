@@ -90,6 +90,9 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             String qty=String.format("%.0f",Double.parseDouble(((InputData) data.get(position)).Qty));
             txtQty.setText(qty);
 
+            TextView txtSeqNo = (TextView) row.findViewById(R.id.txtSeqNo);
+            txtSeqNo.setText(((InputData) data.get(position)).SeqNo);
+
             //TextView txtUseFlag = (TextView) row.findViewById(R.id.txtUseFlag);
             String useFlag="";
             if(((InputData) data.get(position)).UseFlag.equals("0")){
@@ -104,23 +107,12 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
 
             if ((item.ItemTag).equals(lastPart)) {//마지막 변경된 행 강조표시
                 detailLayout.setBackgroundColor(Color.YELLOW);
-
                 this.lastPosition = position;
+                //detailLayout.findFocus();
             }
-
-
-            /*row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    //new GetOneItemData(item.PartCode, item.PartSpec, item.PartName, item.PartSpecName).execute(context.getString(R.string.service_address) + "getOneItemData");
-                    String url=context.getString(R.string.service_address) + "getOneItemData";
-                    ContentValues values = new ContentValues();
-                    values.put("PartCode", item.PartCode);
-                    values.put("PartSpec", item.PartSpec);
-                    InputAdapter.GetOneItemData gid = new InputAdapter.GetOneItemData(url, values, item.PartName, item.PartSpecName);
-                    gid.execute();
-                }
-            });*/
+            else{
+                detailLayout.setBackgroundColor(Color.TRANSPARENT);
+            }
         }
 
         row.setOnLongClickListener(new View.OnLongClickListener() {

@@ -45,6 +45,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     TextView txtScrappedQty;
     TextView txtOutputTotal;
     TextView txtWorksOrderNo;
+    TextView txtRepresent;
     String worksOrderNo;
     String costCenter;
     String costCenterName;
@@ -86,12 +87,14 @@ public class ActivityProductionPerformance extends BaseActivity {
         this.txtInputTotal = findViewById(R.id.txtInputTotal);
         this.txtOutputTotal = findViewById(R.id.txtOutputTotal);
         this.txtWorksOrderNo = findViewById(R.id.txtWorksOrderNo);
+        this.txtRepresent=findViewById(R.id.txtRepresent);
         this.txtWorksOrderNo.setText(worksOrderNo + " / " + costCenterName);
         this.txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).InputQty)));
-        this.txtOutputTotal.setText(",   생산: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty)) + " / "
+        this.txtOutputTotal.setText(", 발행/생산: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty)) + " / "
                 + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
         this.txtScrappedQty=findViewById(R.id.txtScrappedQty);
         this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
+        this.txtRepresent.setText(this.productionInfoArrayList.get(0).PartName+"("+this.productionInfoArrayList.get(0).PartSpecName+")");
         this.edtScan=findViewById(R.id.edtScan);
         this.centerSpec=this.productionInfoArrayList.get(0).CenterSpec;
         this.itemTagForDirect = getIntent().getStringExtra("itemTag");
@@ -249,7 +252,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -286,7 +289,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("PartSpecName"),
                             child.getString("MSpec"),
                             child.getString("Qty"),
-                            child.getString("UseFlag")
+                            child.getString("UseFlag"),
+                            child.getString("SeqNo")
                     );
                     inputDataArrayList.add(inputData);
                 }
@@ -299,13 +303,14 @@ public class ActivityProductionPerformance extends BaseActivity {
                 getOutputData(itemTag2, itemTagForDirect);//생산정보 가져오기
                 listViewInput.setAdapter(inputAdapter);
                 //listViewInput.setCacheColorHint(Color.TRANSPARENT);
-                listViewInput.setSelection(inputAdapter.lastPosition);
-
+                listViewInput.setSelection(inputDataArrayList.size()-1);
+                progressOFF();
 
             } catch (Exception e) {
                 e.printStackTrace();
+                //progressOFF();
             } finally {
-                progressOFF();
+
             }
 
         }
@@ -329,7 +334,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -365,7 +370,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("PartSpec"),
                             child.getString("PartSpecName"),
                             child.getString("MSpec"),
-                            child.getString("Qty")
+                            child.getString("Qty"),
+                            child.getString("SeqNo")
                     );
                     outputDataArrayList.add(outputData);
 
@@ -376,14 +382,17 @@ public class ActivityProductionPerformance extends BaseActivity {
                     outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag, costCenter, mHandler);
                 listViewOutput.setAdapter(outputAdapter);
                 //listViewOutput.setCacheColorHint(Color.TRANSPARENT);
-                listViewOutput.setSelection(outputAdapter.lastPosition);
+                //listViewOutput.setSelection(outputAdapter.lastPosition);
+                listViewOutput.setSelection(outputDataArrayList.size()-1);
+                progressOFF();
                 getProductionBasicInfo(itemTagForDirect);
 
 
             } catch (Exception e) {
                 e.printStackTrace();
+                //progressOFF();
             } finally {
-                progressOFF();
+
             }
         }
     }
@@ -423,7 +432,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
         @Override
         protected String doInBackground(Void... params) {
@@ -461,7 +470,9 @@ public class ActivityProductionPerformance extends BaseActivity {
                             child.getString("IssueOutputQty"),
                             child.getString("LocationNo"),
                             child.getString("ScrappedQty"),
-                            child.getString("CenterSpec")
+                            child.getString("CenterSpec"),
+                            child.getString("PartName"),
+                            child.getString("PartSpecName")
                     );
 
                     productionInfoArrayList.add(productionInfo);
@@ -471,20 +482,23 @@ public class ActivityProductionPerformance extends BaseActivity {
 
                 txtWorksOrderNo.setText(worksOrderNo + " / " + costCenterName);
                 txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).InputQty)));
-                txtOutputTotal.setText(",   생산: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).IssueOutputQty)) + " / "
+                txtOutputTotal.setText(", 발행/생산: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).IssueOutputQty)) + " / "
                         + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).OutputQty)));
                 txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).ScrappedQty)));
-                
-                
+                txtRepresent.setText(productionInfoArrayList.get(0).PartName+"("+productionInfoArrayList.get(0).PartSpecName+")");
+
                 if(!itemTagForDirect.equals("")){//바로등록
                     judgeInputOutput(itemTagForDirect);
                 }
+                //progressOFF();
 
             } catch (Exception e) {
                 e.printStackTrace();
+                progressOFF();
             }
             finally {
-                progressOFF();
+
+
             }
 
         }
@@ -575,7 +589,7 @@ public class ActivityProductionPerformance extends BaseActivity {
                         }
                     });
                     alertBuilder.show();
-                    progressOFF();
+                    //progressOFF();
                     return;
                 }
 
@@ -586,15 +600,15 @@ public class ActivityProductionPerformance extends BaseActivity {
                     setOutputData(values.get("ItemTag").toString());
                 } else {
                     Toast.makeText(getBaseContext(), "투입, 실적 TAG정보가 없습니다.", Toast.LENGTH_SHORT).show();
-                    progressOFF();
+                    //progressOFF();
                     return;
                 }
 
             } catch (Exception e) {
                 e.printStackTrace();
+                //progressOFF();
             } finally {
                 itemTagForDirect="";
-                progressOFF();
             }
 
         }
@@ -627,7 +641,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -672,8 +686,9 @@ public class ActivityProductionPerformance extends BaseActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                //progressOFF();
             } finally {
-                progressOFF();
+
             }
 
         }
@@ -708,7 +723,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -744,8 +759,9 @@ public class ActivityProductionPerformance extends BaseActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
+                //progressOFF();
             } finally {
-                progressOFF();
+
             }
 
         }

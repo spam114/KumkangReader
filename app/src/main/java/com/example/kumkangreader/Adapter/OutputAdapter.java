@@ -28,6 +28,7 @@ public class OutputAdapter extends ArrayAdapter<OutputData> implements BaseActiv
     public int lastPosition;//마지막에 변화된 행값
     String costCenter;
     Handler mHandler;
+    //ListView listView;
     //int adapterType;//0번instruction(지시어뎁터), 1번스캔(input어뎁터)
 
 
@@ -38,6 +39,7 @@ public class OutputAdapter extends ArrayAdapter<OutputData> implements BaseActiv
         this.data = data;
         this.costCenter=costCenter;
         this.mHandler= mHandler;
+        //this.listView=listView;
         //this.adapterType = adapterType;
         //this.stockOutNo = stockOutNo;
     }
@@ -50,6 +52,7 @@ public class OutputAdapter extends ArrayAdapter<OutputData> implements BaseActiv
         this.lastPart = lastPart;
         this.costCenter=costCenter;
         this.mHandler= mHandler;
+        //this.listView=listView;
         //this.adapterType = adapterType;
         //this.stockOutNo = stockOutNo;
     }
@@ -87,13 +90,21 @@ public class OutputAdapter extends ArrayAdapter<OutputData> implements BaseActiv
             TextView txtQty = (TextView) row.findViewById(R.id.txtQty);
             String qty=String.format("%.0f",Double.parseDouble(((OutputData) data.get(position)).Qty));
             txtQty.setText(qty);
+            TextView txtSeqNo = (TextView) row.findViewById(R.id.txtSeqNo);
+            txtSeqNo.setText(((OutputData) data.get(position)).SeqNo);
 
             LinearLayout detailLayout = row.findViewById(R.id.detailLayout);
 
             if ((item.ItemTag).equals(lastPart)) {//마지막 변경된 행 강조표시
                 detailLayout.setBackgroundColor(Color.YELLOW);
-
                 this.lastPosition = position;
+                //this.listView.setSelection(position);
+                //txtQty.requestFocus();
+                //parent.requestFocus(position);
+                //detailLayout.requestFocus();
+            }
+            else{
+                detailLayout.setBackgroundColor(Color.TRANSPARENT);
             }
 
             //LinearLayout layoutQty=row.findViewById(R.id.layoutQty);

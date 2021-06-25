@@ -18,7 +18,10 @@ import android.view.Display;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -47,6 +50,12 @@ public class ActivityMoveCoil2 extends BaseActivity {
     String selectedCoil;
     String selectedPartCode;
     String selectedPartSpec;
+    String rowIndex;
+    String colIndex;
+    String binNo;
+    Boolean firstInputCoil;
+    Spinner spinnerZone;
+
 
     public void startProgress() {
         progressON("Loading...");
@@ -67,15 +76,137 @@ public class ActivityMoveCoil2 extends BaseActivity {
 
         //잠깐주석
         binArrayList=new ArrayList<>();
-        this.locationNo = getIntent().getStringExtra("locationNo");
-        this.maxRow = Integer.parseInt(getIntent().getStringExtra("maxRow"));
-        this.maxCol = Integer.parseInt(getIntent().getStringExtra("maxCol"));
-        this.zone="D";//zone A로 고정
+        this.selectedCoil="";
+        this.selectedPartCode="";
+        this.selectedPartSpec="";
+        this.firstInputCoil=false;
+        this.locationNo ="23961";//원자재 창고(코일)
+        this.spinnerZone=findViewById(R.id.spinnerZone);
 
-        SelectCoilData("","","");
-        /*this.maxRow = 12;
-        this.maxCol = 4;*/
-        getBin();
+        this.rowIndex="-1";
+        this.colIndex="-1";
+        this.binNo="-1";
+
+        String[] zoneList=new String[6];
+        zoneList[0]="A";
+        zoneList[1]="B";
+        zoneList[2]="C";
+        zoneList[3]="D";
+        zoneList[4]="E";
+        zoneList[5]="F";
+
+
+        if(!getIntent().getStringExtra("coilNo").equals("")){//최초코일입고
+            this.selectedCoil=getIntent().getStringExtra("coilNo");
+            this.selectedPartCode=getIntent().getStringExtra("partCode");
+            this.selectedPartSpec=getIntent().getStringExtra("partSpec");
+            firstInputCoil=true;
+            SelectCoilData(selectedCoil,selectedPartCode,selectedPartSpec);
+        }
+
+        ArrayAdapter<String> zoneAdapter = new ArrayAdapter<String>(ActivityMoveCoil2.this, android.R.layout.simple_spinner_dropdown_item, zoneList);
+        this.spinnerZone.setAdapter(zoneAdapter);
+        this.spinnerZone.setDropDownWidth(150);
+        this.spinnerZone.setSelection(0);
+        this.spinnerZone.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                switch (position){
+                    case 0:
+                        zone="A";
+                        break;
+                    case 1:
+                        zone="B";
+                        break;
+                    case 2:
+                        zone="C";
+                        break;
+                    case 3:
+                        zone="D";
+                        break;
+                    case 4:
+                        zone="E";
+                        break;
+                    case 5:
+                        zone="F";
+                        break;
+                }
+                getMaxLengthTable(zone);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+
+    /**
+     * 존별 테이블의 가로 세로 최대값을 가져온후, 태그이동 액티비티로 이동
+     */
+    public void getMaxLengthTable(String zone){
+        String url = getString(R.string.service_address) + "getMaxLengthTable";
+        ContentValues values = new ContentValues();
+        values.put("BusinessClassCode", "2");
+        values.put("Zone", zone);
+        GetMaxLengthTable gsod = new GetMaxLengthTable(url, values);
+        gsod.execute();
+    }
+
+    public class GetMaxLengthTable extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetMaxLengthTable(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //progress bar를 보여주는 등등의 행위
+            startProgress();
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+
+            try {
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
+                        ErrorCheck = child.getString("ErrorCheck");
+                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    maxRow = Integer.parseInt(child.getString("MaxRow"));
+                    maxCol = Integer.parseInt(child.getString("MaxCol"));
+                }
+
+                getBin();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                progressOFF();
+            }
+
+        }
     }
 
     private void getBin() {
@@ -266,8 +397,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                             binContent = binArrayList.get(k);
                             break;
                         }
-                        bin=this.zone+"-"+String.format("%02d", j+1)+String.format("%02d", i+1);
                     }
+                    bin=this.zone+"-"+String.format("%02d", i+1)+String.format("%02d", j+1);
                     SpannableStringBuilder ssb = new SpannableStringBuilder(contents);
                     if (contents.length() != 0) {
                         ssb.setSpan(new ForegroundColorSpan(Color.parseColor("#000BFF")), 0, partLength, Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
@@ -290,12 +421,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     tvNo.setWidth(width / 4);
                     tvNo.setHeight(300);
                     tvNo.setTextSize(textSize);
-                    //tvNo.setMovementMethod(new ScrollingMovementMethod());
-                    //tvNo.setSingleLine(false);
-                    //tvNo.setLayoutParams(linearLayoutParams);
                     if(contents.length() != 0){
                         tvNo.setText(ssb);
-                        //tvNo.setLayoutParams(linearLayoutParams);
                     }
                     else{
                         tvNo.setText(bin);
@@ -380,11 +507,16 @@ public class ActivityMoveCoil2 extends BaseActivity {
                 public void onClick(View v) {
 
                     Bin bin = (Bin) v.getTag(R.id.objBin);
-                    final String rowIndex = v.getTag(R.id.rowIndex).toString();
-                    final String colIndex = v.getTag(R.id.colIndex).toString();
-                    String binNo=v.getTag(R.id.binNo).toString();
+                    rowIndex = v.getTag(R.id.rowIndex).toString();
+                    colIndex = v.getTag(R.id.colIndex).toString();
+                    binNo=v.getTag(R.id.binNo).toString();
                     if (bin != null) {//데이터가 들어있다면 -> 이동할 코일 선택
                         //여기만적용
+
+                        if(firstInputCoil){
+                            Toast.makeText(ActivityMoveCoil2.this, "이미 코일이 적재되어 있습니다.", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
                         SelectCoilData(bin.LinkCode, bin.PartCode, bin.PartSpec);
                         getBin();
                     }
@@ -404,7 +536,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
 
                                                 @Override
                                                 public void onClick(DialogInterface dialog, int which) {
-                                                    moveCoil("D", colIndex, rowIndex, selectedCoil, selectedPartCode, selectedPartSpec);
+                                                    moveCoil(zone, colIndex, rowIndex, selectedCoil, selectedPartCode, selectedPartSpec);
                                                 }
                                             }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                 @Override
@@ -478,7 +610,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
                 }
                 //코일 이동후 미선택 코일 미선택 상태로 변경
                 SelectCoilData("","","");
-
+                firstInputCoil=false;
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {

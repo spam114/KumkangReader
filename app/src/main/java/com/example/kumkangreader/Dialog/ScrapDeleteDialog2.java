@@ -273,6 +273,7 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                             child.getString("PartSpec"),
                             child.getString("PartSpecName"),
                             child.getString("MSpec"),
+                            "0",
                             "0"
                     );
                 }

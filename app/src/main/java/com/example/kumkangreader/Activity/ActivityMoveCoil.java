@@ -267,7 +267,7 @@ public class ActivityMoveCoil extends BaseActivity {
                             binContent = binArrayList.get(k);
                             break;
                         }
-                        bin=this.zone+"-"+String.format("%02d", j+1)+String.format("%02d", i+1);
+                        bin=this.zone+"-"+String.format("%02d", i+1)+String.format("%02d", j+1);
                     }
                     SpannableStringBuilder ssb = new SpannableStringBuilder(contents);
                     if (contents.length() != 0) {

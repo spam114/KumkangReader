@@ -11,6 +11,7 @@ import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -25,6 +26,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.kumkangreader.Application.ApplicationClass;
+import com.example.kumkangreader.Dialog.KeyInDialog;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.CostCenter;
 import com.example.kumkangreader.Object.NonOperationClassCodes;
@@ -59,6 +61,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
     Chronometer chronometer;
     Button btnStop;
     Button btnStart;
+    Button btnKeyIn;
+    Button btnSearch;
     ArrayList<CostCenter> costCenterArrayList2;
     ArrayList<NonOperationClassCodes> nonOperationClassCodesArrayList2;
     ArrayList<NonOperationCodes> nonOperationCodeArrayList2;
@@ -102,6 +106,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
         //this.txtTest=rootView.findViewById(R.id.txtTest);
         this.chronometer = rootView.findViewById(R.id.chronometer);
         this.btnStart=rootView.findViewById(R.id.btnStart);
+        this.btnKeyIn=rootView.findViewById(R.id.btnKeyIn);
+        this.btnSearch=rootView.findViewById(R.id.btnSearch);
         this.btnStop=rootView.findViewById(R.id.btnStop);
 
         this.btnStart.setOnClickListener(new View.OnClickListener() {//현재 가동상태
@@ -122,6 +128,29 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
             public void onClick(View v) {
                 setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "1",
                         nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+            }
+        });
+
+        this.btnKeyIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                if(nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCodeName.equals("등록안됨")){
+                    Toast.makeText(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                KeyInDialog keyInDialog = new KeyInDialog(context,"비가동 등록", costCenterSpinner.getSelectedItem().toString()+": "
+                +nonOperationClassCodesSpinner.getSelectedItem().toString()+"("+nonOperationCodeSpinner.getSelectedItem().toString()+")",
+                        costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter,
+                        nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+                //window.setLayout( WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+                WindowManager.LayoutParams params2 = keyInDialog.getWindow().getAttributes();
+                //params2.width = WindowManager.LayoutParams.MATCH_PARENT;
+                //params2.height = WindowManager.LayoutParams.MATCH_PARENT;
+                keyInDialog.getWindow().setAttributes(params2);
+                keyInDialog.setCancelable(false);
+                keyInDialog.show();
             }
         });
 
@@ -386,6 +415,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     layoutOnlyView2.setVisibility(View.GONE);
                     layoutTime.setVisibility(View.GONE);
                     btnStart.setVisibility(View.VISIBLE);
+                    btnKeyIn.setVisibility(View.VISIBLE);
+                    btnSearch.setVisibility(View.VISIBLE);
                     //.setVisibility(View.VISIBLE);
                     getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
                     return;
@@ -407,6 +438,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                         layoutOnlyView2.setVisibility(View.GONE);
                         layoutTime.setVisibility(View.GONE);
                         btnStart.setVisibility(View.VISIBLE);
+                        btnKeyIn.setVisibility(View.VISIBLE);
+                        btnSearch.setVisibility(View.VISIBLE);
                         //layoutCostCenter.setVisibility(View.VISIBLE);
                         getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
                         return;
@@ -425,6 +458,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     txtCurrentClass.setText(child.getString("NonOperationClassCodeName"));
                     txtCurrentCode.setText(child.getString("NonOperationCodeName"));
                     btnStart.setVisibility(View.GONE);
+                    btnKeyIn.setVisibility(View.GONE);
+                    btnSearch.setVisibility(View.GONE);
                     getNonOperationClassCodes(costCenter);//비가동 대분류를 가져온다.
 
                     getNonOperationCodes(child.getString("NonOperationClassCode"), costCenter);

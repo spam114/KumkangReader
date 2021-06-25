@@ -12,6 +12,7 @@ public class OutputData implements Serializable {
     public String PartSpecName;
     public String MSpec;
     public String Qty;
+    public String SeqNo;
 
     public OutputData(
             String ItemTag,
@@ -21,7 +22,8 @@ public class OutputData implements Serializable {
             String PartSpec,
             String PartSpecName,
             String MSpec,
-            String Qty
+            String Qty,
+            String SeqNo
     ){
         this.ItemTag=ItemTag;
         this.CoilNo=CoilNo;
@@ -31,5 +33,6 @@ public class OutputData implements Serializable {
         this.PartSpecName=PartSpecName;
         this.MSpec=MSpec;
         this.Qty=Qty;
+        this.SeqNo=SeqNo;
     }
 }
