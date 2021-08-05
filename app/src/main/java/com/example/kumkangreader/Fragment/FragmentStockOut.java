@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -14,14 +13,16 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Activity.ActivityProductionStock;
 import com.example.kumkangreader.Activity.ActivityStockOut;
+import com.example.kumkangreader.Activity.ActivityViewStockOut;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.MainActivity2;
@@ -39,6 +40,8 @@ import java.util.ArrayList;
 public class FragmentStockOut extends Fragment implements BaseActivityInterface {
     Context context;
     TextInputEditText edtScan;
+    Button btnViewData;
+    Button btnStock;
 
     public FragmentStockOut(){
 
@@ -53,7 +56,6 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
     public StockOut stockOut;
     //Button btnCamera;
     TextView txtState;
-    TextView txtVersion;
     ArrayList<StockOutDetail> stockOutDetailArrayList;
     ArrayList<StockOutDetail> scanDataArrayList;
     private void startProgress() {
@@ -70,16 +72,15 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.layout1, container, false);
         this.txtState = rootView.findViewById(R.id.txtState);
-        this.txtVersion = rootView.findViewById(R.id.txtVersion);
         this.edtScan=rootView.findViewById(R.id.edtScan);
         //this.edtScan.setText("2105110001");
         this.stockOutDetailArrayList = new ArrayList<>();
         this.scanDataArrayList = new ArrayList<>();
-        try {
+       /* try {
             txtVersion.setText("version "+context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName);
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
 
         this.edtScan.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
@@ -101,6 +102,24 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
                     ((MainActivity2)(context)).getStockOutMaster("E3-"+v.getText().toString());
                 }
                 return false;
+            }
+        });
+
+        this.btnViewData=rootView.findViewById(R.id.btnViewData);
+        this.btnViewData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityViewStockOut.class);
+                startActivity(i);
+            }
+        });
+
+        this.btnStock=rootView.findViewById(R.id.btnStock);
+        this.btnStock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityProductionStock.class);
+                startActivity(i);
             }
         });
 
@@ -378,6 +397,11 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
         ApplicationClass.getInstance().progressOFF();
     }
 
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
+    }
+
     public class SetPrintOrderData extends AsyncTask<Void, Void, String> {
     String url;
     ContentValues values;
@@ -412,10 +436,12 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
 
             if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                 ErrorCheck = child.getString("ErrorCheck");
-                Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                showErrorDialog(context, ErrorCheck,2);
                 return;
             }
-            Toast.makeText(getContext(), "출력이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+            //Toast.makeText(getContext(), "출력이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
+            showErrorDialog(context, "출력이 완료 되었습니다.",1);
 
 
         } catch (Exception e) {
@@ -466,7 +492,8 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
 
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
-                    Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(context, ErrorCheck,2);
                     return;
                 }
                 StockOutNo = child.getString("StockOutNo");
@@ -527,7 +554,8 @@ public class FragmentStockOut extends Fragment implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     stockOutDetail = new StockOutDetail(child.getString("PartCode"), child.getString("PartSpec"), child.getString("PartName"),
@@ -623,7 +651,8 @@ public class GetScanData extends AsyncTask<Void, Void, String> {
 
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
-                    Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(context, ErrorCheck,2);
                     return;
                 }
                 stockOutDetail = new StockOutDetail(child.getString("PartCode"), child.getString("PartSpec"),

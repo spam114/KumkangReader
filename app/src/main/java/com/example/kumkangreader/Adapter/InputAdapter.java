@@ -25,6 +25,7 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
     int layoutRsourceId;
     ArrayList data;
     String lastPart;//마지막에 추가된 품목,규격
+    String worksOrderNo;
     String costCenter;
     public int lastPosition;//마지막에 변화된 행값
     Handler mHandler;
@@ -32,23 +33,25 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
 
 
 
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String costCenter, Handler mHandler) {
+    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String worksOrderNo,String costCenter, Handler mHandler) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
         this.data = data;
+        this.worksOrderNo=worksOrderNo;
         this.costCenter=costCenter;
         this.mHandler=mHandler;
         //this.adapterType = adapterType;
         //this.stockOutNo = stockOutNo;
     }
 
-    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart, String costCenter, Handler mHandler) {
+    public InputAdapter(Context context, int layoutResourceID, ArrayList data, String lastPart, String worksOrderNo,String costCenter, Handler mHandler) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
         this.data = data;
         this.lastPart = lastPart;
+        this.worksOrderNo=worksOrderNo;
         this.costCenter=costCenter;
         this.mHandler=mHandler;
         //this.adapterType = adapterType;
@@ -119,7 +122,7 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
             @Override
             public boolean onLongClick(View v) {
 
-                ScrapDeleteDialog sdd = new ScrapDeleteDialog(context, ((InputData) data.get(position)).ItemTag, costCenter, mHandler);
+                ScrapDeleteDialog sdd = new ScrapDeleteDialog(context, ((InputData) data.get(position)).ItemTag, worksOrderNo,costCenter, mHandler);
                 //sdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
                 sdd.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
                 sdd.show();
@@ -149,6 +152,11 @@ public class InputAdapter extends ArrayAdapter<InputData> implements BaseActivit
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 
     private void startProgress() {

@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
@@ -168,14 +167,16 @@ public class InventoryAdapter extends ArrayAdapter<Inventory> implements BaseAct
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                 }
                 //삭제성공
                 Message msg= mHandler.obtainMessage();
                 mHandler.sendMessage(msg);
-                Toast.makeText(context, "삭제 되었습니다.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "삭제 되었습니다.", Toast.LENGTH_SHORT).show();
+                showErrorDialog(context, "작업이 완료 되었습니다.",1);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -202,6 +203,11 @@ public class InventoryAdapter extends ArrayAdapter<Inventory> implements BaseAct
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 
     private void startProgress() {

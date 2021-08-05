@@ -14,7 +14,6 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
@@ -36,6 +35,7 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
     ArrayList data;
    /* String lastPart;//마지막에 추가된 품목,규격
     public int lastPosition;//마지막에 변화된 행값*/
+    String worksOrderNo;
     String costCenter;
     Handler mHandler;
     String itemTag;
@@ -49,11 +49,12 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
     ImageView imageView;
 
 
-    public ScrapAdapter(Context context, int layoutResourceID, ArrayList data, String itemTag, String costCenter, Handler mHandler) {
+    public ScrapAdapter(Context context, int layoutResourceID, ArrayList data, String itemTag,  String worksOrderNo, String costCenter, Handler mHandler) {
         super(context, layoutResourceID, data);
         this.context = context;
         this.layoutRsourceId = layoutResourceID;
         this.data = data;
+        this.worksOrderNo=worksOrderNo;
         this.costCenter=costCenter;
         this.itemTag=itemTag;
         this.mHandler= mHandler;
@@ -131,7 +132,8 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
                                     }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(getContext(), "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getContext(), "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                            showErrorDialog(context, "취소 되었습니다.",1);
                         }
                     }).show();
                 }
@@ -203,8 +205,9 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
         values.put("MSpec", item.MSpec);
 
         values.put("ItemTag", this.itemTag);
+        values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", this.costCenter);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         DeleteScrap gsod = new DeleteScrap(url, values);
         gsod.execute();
 
@@ -259,7 +262,8 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
 
@@ -323,6 +327,11 @@ public class ScrapAdapter extends ArrayAdapter<ScrapAdapter> implements BaseActi
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 
     private void startProgress() {

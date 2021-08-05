@@ -37,6 +37,7 @@ import com.example.kumkangreader.Constants;
 import com.example.kumkangreader.MainActivity2;
 import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.Object.WorkClass;
+import com.example.kumkangreader.PreferenceManager;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -230,7 +231,8 @@ public class SplashScreenActivity extends BaseActivity {
 
             try {
                 if (result.equals("")) {
-                    Toast.makeText(SplashScreenActivity.this, "서버연결에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(SplashScreenActivity.this, "서버연결에 실패하였습니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(SplashScreenActivity.this, "서버연결에 실패하였습니다.",2);
                     ActivityCompat.finishAffinity(SplashScreenActivity.this);
                 }
                 JSONArray jsonArray = new JSONArray(result);
@@ -286,7 +288,8 @@ public class SplashScreenActivity extends BaseActivity {
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Toast.makeText(SplashScreenActivity.this, "최신버전으로 업데이트 하시기 바랍니다.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(SplashScreenActivity.this, "최신버전으로 업데이트 하시기 바랍니다.", Toast.LENGTH_LONG).show();
+                showErrorDialog(SplashScreenActivity.this, "최신버전으로 업데이트 하시기 바랍니다.",2);
                 ActivityCompat.finishAffinity(SplashScreenActivity.this);
             }
         }).show();
@@ -301,6 +304,7 @@ public class SplashScreenActivity extends BaseActivity {
 
 
             Toast.makeText(context, "다운로드 완료", Toast.LENGTH_SHORT).show();
+            //showErrorDialog(SplashScreenActivity.this, "다운로드 완료",1);
 
             DownloadManager.Query query = new DownloadManager.Query();
             query.setFilterById(mId);
@@ -426,9 +430,6 @@ public class SplashScreenActivity extends BaseActivity {
                 Users.Remark = "";
                 Users.DeviceName = BluetoothAdapter.getDefaultAdapter().getName();//블루투스 권한 필요 manifest확인: 블루투스가 없으면 에러남
             } catch (Exception e) {
-                String str = e.getMessage();
-
-                String str2 = str;
             } finally {
                 InsertAppLoginHistory();
             }
@@ -455,6 +456,7 @@ public class SplashScreenActivity extends BaseActivity {
         String url = getString(R.string.service_address) + "CheckAppProgramsPower";
         ContentValues values = new ContentValues();
         values.put("UserID", Users.PhoneNumber);
+        values.put("AndroidID", Users.AndroidID);
         values.put("AppCode", getString(R.string.app_code));
         CheckAppProgramsPower capp = new CheckAppProgramsPower(url, values);
         capp.execute();
@@ -498,7 +500,8 @@ public class SplashScreenActivity extends BaseActivity {
                    /* Intent loginIntent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     startActivity(loginIntent);
                     return;*/
-                    Toast.makeText(getBaseContext(), "사용자 혹은 권한이 등록되어있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), "사용자 혹은 권한이 등록되어있지 않습니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(SplashScreenActivity.this, "사용자 혹은 권한이 등록되어있지 않습니다.",2);
                     Intent Intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     startActivity(Intent);
                     return;
@@ -507,7 +510,8 @@ public class SplashScreenActivity extends BaseActivity {
                         JSONObject child = jsonArray.getJSONObject(i);
                         if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                             ErrorCheck = child.getString("ErrorCheck");
-                            Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                            showErrorDialog(SplashScreenActivity.this, ErrorCheck,2);
                             return;
                         }
                         Users.UserName=child.getString("UserName");
@@ -577,7 +581,8 @@ public class SplashScreenActivity extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(SplashScreenActivity.this, ErrorCheck,2);
                         return;
                     }
 
@@ -594,30 +599,38 @@ public class SplashScreenActivity extends BaseActivity {
                 sdd.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
                 sdd.show();*/
 
+                int workClassCodeIndex=PreferenceManager.getInt(SplashScreenActivity.this, "workClassCodeIndex");
 
-                new MaterialAlertDialogBuilder(SplashScreenActivity.this)
-                        .setTitle("작업조를 선택하세요")
-                        .setSingleChoiceItems(workClassSequences, 0, new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                Users.WorkClassCode=workClassArrayList.get(which).WorkClassCode;
-                                Users.WorkClassName=workClassArrayList.get(which).WorkClassName;
-                            }
-                        })
-                        .setOnDismissListener(new DialogInterface.OnDismissListener() {
-                            @Override
-                            public void onDismiss(DialogInterface dialog) {
-                                startActivity(intent);
-                            }
-                        })
-                        .setPositiveButton("확인", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                dialog.dismiss();
-                            }
-                        })
-                        .show();
-
+                Users.WorkClassCode=workClassArrayList.get(workClassCodeIndex).WorkClassCode;
+                Users.WorkClassName=workClassArrayList.get(workClassCodeIndex).WorkClassName;
+                if(!(Users.authorityList.size()==1 && Users.authorityList.contains(2))){
+                    new MaterialAlertDialogBuilder(SplashScreenActivity.this)
+                            .setTitle("작업조를 선택하세요")
+                            .setSingleChoiceItems(workClassSequences, workClassCodeIndex, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Users.WorkClassCode=workClassArrayList.get(which).WorkClassCode;
+                                    Users.WorkClassName=workClassArrayList.get(which).WorkClassName;
+                                    PreferenceManager.setInt(SplashScreenActivity.this, "workClassCodeIndex", which);
+                                }
+                            })
+                            .setOnDismissListener(new DialogInterface.OnDismissListener() {
+                                @Override
+                                public void onDismiss(DialogInterface dialog) {
+                                    startActivity(intent);
+                                }
+                            })
+                            .setPositiveButton("확인", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    dialog.dismiss();
+                                }
+                            })
+                            .show();
+                }
+                else{
+                    startActivity(intent);
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();

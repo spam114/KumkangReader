@@ -3,6 +3,8 @@ package com.example.kumkangreader.Fragment;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,6 +27,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Activity.ActivityCostCenterStopOperations;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Dialog.KeyInDialog;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
@@ -32,8 +35,10 @@ import com.example.kumkangreader.Object.CostCenter;
 import com.example.kumkangreader.Object.NonOperationClassCodes;
 import com.example.kumkangreader.Object.NonOperationCodes;
 import com.example.kumkangreader.Object.Users;
+import com.example.kumkangreader.PreferenceManager;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputLayout;
 
 import org.json.JSONArray;
@@ -114,20 +119,64 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
             @Override
             public void onClick(View v) {
 
-                if(nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCodeName.equals("등록안됨")){
-                    Toast.makeText(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "2",
-                        nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+                new MaterialAlertDialogBuilder(context, R.style.Body_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+                        .setTitle("비가동 시작")
+                        .setMessage("'"+costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenterName+"' 의 비가동을 시작하시겠습니까?")
+                        .setCancelable(true)
+                        .setPositiveButton
+                                ("확인", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        if(nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCodeName.equals("등록안됨")){
+                                            //Toast.makeText(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.", Toast.LENGTH_SHORT).show();
+                                            showErrorDialog(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.",2);
+                                            return;
+                                        }
+                                        setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "2",
+                                                nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+                                    }
+                                })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
             }
         });
 
         this.btnStop.setOnClickListener(new View.OnClickListener() {//현재 비가동상태
             @Override
             public void onClick(View v) {
-                setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "1",
-                        nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+
+                new MaterialAlertDialogBuilder(context, R.style.Body_ThemeOverlay_MaterialComponents_MaterialAlertDialog)
+                        .setTitle("비가동 종료")
+                        .setMessage("'"+costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenterName+"' 의 비가동을 종료하시겠습니까?")
+                        .setCancelable(true)
+                        .setPositiveButton
+                                ("확인", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        setCostCenterStopOperations(costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter, "1",
+                                                nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCode);
+                                    }
+                                })
+                        .setNegativeButton("취소", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+
+                            }
+                        }).show();
+            }
+        });
+
+        this.btnSearch.setOnClickListener(new View.OnClickListener() {//내역조회
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityCostCenterStopOperations.class);
+                i.putExtra("costCenter", costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenter);
+                i.putExtra("costCenterName", costCenterArrayList2.get(costCenterSpinner.getSelectedItemPosition()).CostCenterName);
+                startActivity(i);
             }
         });
 
@@ -136,7 +185,7 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
             public void onClick(View v) {
 
                 if(nonOperationCodeArrayList2.get(nonOperationCodeSpinner.getSelectedItemPosition()).NonOperationCodeName.equals("등록안됨")){
-                    Toast.makeText(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(context, "비가동 코드가 등록되어있지 않습니다. 관리자에게 문의하시기 바랍니다.",2);
                     return;
                 }
 
@@ -193,6 +242,7 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
         values.put("CurrentState", currentState);
         values.put("DayFlag", Users.WorkClassName);
         values.put("NonOperationCode", nonOperationCode);
+        values.put("UserCode", Users.UserID);
         SetCostCenterStopOperations gsod = new SetCostCenterStopOperations(url, values);
         gsod.execute();
     }
@@ -227,50 +277,26 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
             // 결과에 따른 UI 수정 등은 여기서 합니다
 
             try {
-                CostCenter costCenter;
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
                 String ReturnMessage="";
-                ArrayAdapter<String> costCenterArrayAdapter;
-                final ArrayList<String> costCenterArrayList= new ArrayList<>();
-                costCenterArrayList2= new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_LONG).show();
+                        //showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     ReturnMessage=child.getString("ReturnMessage");
-
-                    costCenter = new CostCenter();
-                    costCenter.CostCenter = child.getString("CostCenter");
-                    costCenter.CostCenterName = child.getString("CostCenterName");
-                    costCenterArrayList.add(costCenter.CostCenterName);
-                    costCenterArrayList2.add(costCenter);
                 }
-                costCenterArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, costCenterArrayList);
-                costCenterSpinner.setAdapter(costCenterArrayAdapter);
+                Toast.makeText(context, ReturnMessage, Toast.LENGTH_LONG).show();
+                //showErrorDialog(context, ReturnMessage,2);
 
-                costCenterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-                    @Override
-                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-                        chronometer.setBase(SystemClock.elapsedRealtime());
-                        chronometer.stop();
-                        getCostCenterStopOperations(costCenterArrayList2.get(position).CostCenter);
-                    }
-
-                    @Override
-                    public void onNothingSelected(AdapterView<?> parent) {
-
-                    }
-                });
-
-                Toast.makeText(context, ReturnMessage, Toast.LENGTH_SHORT).show();
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
+                getCostCenter();
                 progressOFF();
             }
         }
@@ -327,7 +353,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_LONG).show();
+                        //showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     costCenter = new CostCenter();
@@ -338,7 +365,6 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                 }
                 costCenterArrayAdapter = new ArrayAdapter<>(context, R.layout.list_item, costCenterArrayList);
                 costCenterSpinner.setAdapter(costCenterArrayAdapter);
-
                 costCenterSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -346,6 +372,7 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                         chronometer.setBase(SystemClock.elapsedRealtime());
                         chronometer.stop();
                         getCostCenterStopOperations(costCenterArrayList2.get(position).CostCenter);
+                        PreferenceManager.setInt(context, "costCenterIndex", position);
                     }
 
                     @Override
@@ -353,6 +380,9 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
 
                     }
                 });
+                int costCenterIndex = PreferenceManager.getInt(context, "costCenterIndex");
+                costCenterSpinner.setSelection(costCenterIndex);
+
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -426,7 +456,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_LONG).show();
+                        //showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     if (!child.getString("EndTime").equals("")) {//EndTime에 데이터가 들어있다-> 가동상태
@@ -556,7 +587,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_LONG).show();
+                        //showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     nonOperationClassCodes = new NonOperationClassCodes();
@@ -653,7 +685,8 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_LONG).show();
+                        //showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     nonOperationCodes=new NonOperationCodes();
@@ -704,6 +737,11 @@ public class FragmentStopOperation extends Fragment  implements BaseActivityInte
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 
 

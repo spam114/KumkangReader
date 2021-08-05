@@ -6,12 +6,17 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.kumkangreader.Adapter.InventoryAdapter;
@@ -20,6 +25,7 @@ import com.example.kumkangreader.Object.Inventory;
 import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.google.android.material.textfield.TextInputEditText;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
@@ -36,6 +42,7 @@ public class ActivityInventorySurvey extends BaseActivity {
     ImageView imvQR;
     Spinner spinnerZone;
     Spinner spinnerZoneSeqNo;
+    TextInputEditText edtNumber;
 
     public void startProgress() {
         progressON("Loading...");
@@ -63,6 +70,29 @@ public class ActivityInventorySurvey extends BaseActivity {
                 intentIntegrator.initiateScan();
             }
         });
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        this.edtNumber=findViewById(R.id.edtNumber);
+        this.edtNumber.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if(hasFocus){
+                    edtNumber.setGravity(Gravity.START);
+                }
+                else{
+                    edtNumber.setGravity(Gravity.CENTER_HORIZONTAL);
+                }
+            }
+        });
+        this.edtNumber.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+
+                if(actionId == EditorInfo.IME_ACTION_DONE){ // IME_ACTION_SEARCH , IME_ACTION_GO
+                    setInventorySurvey("EI-"+v.getText().toString());
+                }
+                return false;
+            }
+        });
         getZone();
 
         //this.scrapDataArrayList = (ArrayList<ScrapData>) getIntent().getSerializableExtra("scrapDataArrayList");
@@ -77,6 +107,7 @@ public class ActivityInventorySurvey extends BaseActivity {
         if (result != null) {
             if (result.getContents() == null) {
                 Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                //showErrorDialog(this, "취소 되었습니다.",2);
             } else {
                 String scanResult;
                 scanResult = result.getContents();
@@ -93,7 +124,7 @@ public class ActivityInventorySurvey extends BaseActivity {
         values.put("ItemTag", itemTag);
         values.put("Zone", spinnerZone.getSelectedItem().toString());
         values.put("ZoneSeqNo", spinnerZoneSeqNo.getSelectedItem().toString());
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         SetInventorySurvey gsod = new SetInventorySurvey(url, values, itemTag);
         gsod.execute();
     }
@@ -137,13 +168,15 @@ public class ActivityInventorySurvey extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
+                        //showErrorDialog(ActivityInventorySurvey.this, ErrorCheck,2);
                         Toast.makeText(ActivityInventorySurvey.this, ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
 
                 }
                 getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), itemTag);
-                Toast.makeText(ActivityInventorySurvey.this, "저장 되었습니다.", Toast.LENGTH_SHORT).show();
+                //showErrorDialog(ActivityInventorySurvey.this, "저장 되었습니다.",1);
+                //Toast.makeText(ActivityInventorySurvey.this, "저장 되었습니다.", Toast.LENGTH_SHORT).show();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -199,6 +232,7 @@ public class ActivityInventorySurvey extends BaseActivity {
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
                         Toast.makeText(ActivityInventorySurvey.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //showErrorDialog(ActivityInventorySurvey.this, ErrorCheck,2);
                         return;
                     }
                     zoneArrayList.add(child.getString("Zone"));
@@ -272,6 +306,7 @@ public class ActivityInventorySurvey extends BaseActivity {
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
                         Toast.makeText(ActivityInventorySurvey.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //showErrorDialog (ActivityInventorySurvey.this, ErrorCheck,2);
                         return;
                     }
                     zoneSeqNoArrayList.add(child.getString("ZoneSeqNo"));
@@ -347,6 +382,7 @@ public class ActivityInventorySurvey extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
+                        //showErrorDialog(ActivityInventorySurvey.this, ErrorCheck,2);
                         Toast.makeText(ActivityInventorySurvey.this, ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }

@@ -1,5 +1,7 @@
 package com.example.kumkangreader.Activity;
 
+import android.content.Context;
+
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.kumkangreader.Application.ApplicationClass;
@@ -22,4 +24,7 @@ public class BaseActivity extends AppCompatActivity {
         ApplicationClass.getInstance().progressOFF();
     }
 
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
+    }
 }

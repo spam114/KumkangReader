@@ -96,6 +96,34 @@
             android:screenOrientation="portrait"
             />
 
+        <activity android:name=".Activity.ActivityCostCenterStopOperations"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+
+        <activity android:name=".Activity.ActivityViewCoil"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+
+        <activity android:name=".Activity.ActivityViewProduction"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+
+        <activity android:name=".Activity.ActivityViewStockOut"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".Activity.ActivityProductionStock"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+        <activity android:name=".Activity.ActivityCoilStock"
+            tools:ignore="LockedOrientationActivity"
+            android:screenOrientation="portrait"
+            />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.provider"

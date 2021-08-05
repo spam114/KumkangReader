@@ -100,6 +100,7 @@ public class ActivityStockOutNew extends BaseActivity{
         });
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+        startProgress();
         getStockOut("");
     }
 
@@ -116,7 +117,8 @@ public class ActivityStockOutNew extends BaseActivity{
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
-                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                showErrorDialog(this, "취소 되었습니다.",1);
             }
             else {
                 String scanResult;
@@ -212,7 +214,7 @@ public class ActivityStockOutNew extends BaseActivity{
         ContentValues values = new ContentValues();
         values.put("StockOutNo", this.stockOut.StockOutNo);
         values.put("ItemTag", itemTag);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         SetStockOut gsod = new SetStockOut(url, values);
         gsod.execute();
     }
@@ -222,7 +224,7 @@ public class ActivityStockOutNew extends BaseActivity{
         ContentValues values = new ContentValues();
         values.put("StockOutNo", this.stockOut.StockOutNo);
         values.put("ItemTag", itemTag);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         DeleteStockOut gsod = new DeleteStockOut(url, values);
         gsod.execute();
     }
@@ -261,18 +263,20 @@ public class ActivityStockOutNew extends BaseActivity{
 
                     if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck=child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityStockOutNew.this, ErrorCheck,2);
                         return;
                     }
                     lastPart=child.getString("PartCode")+"-"+child.getString("PartSpec");
                 }
                 getStockOut(lastPart);
                 Toast.makeText(getBaseContext(), "등록이 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                //showErrorDialog(ActivityStockOutNew.this, "등록이 완료되었습니다.",1);
             } catch (Exception e) {
                 e.printStackTrace();
             }
             finally {
-                progressOFF();
+                //progressOFF();
             }
 
         }
@@ -315,7 +319,8 @@ public class ActivityStockOutNew extends BaseActivity{
 
                     if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck=child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityStockOutNew.this, ErrorCheck,2);
                         return;
                     }
 
@@ -326,6 +331,7 @@ public class ActivityStockOutNew extends BaseActivity{
                 }
 
                 Toast.makeText(getBaseContext(), "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                //showErrorDialog(ActivityStockOutNew.this, "삭제가 완료되었습니다.",1);
 
                 getStockOut("");
 
@@ -333,7 +339,7 @@ public class ActivityStockOutNew extends BaseActivity{
                 e.printStackTrace();
             }
             finally {
-                progressOFF();
+                //progressOFF();
             }
 
         }
@@ -416,7 +422,7 @@ public class ActivityStockOutNew extends BaseActivity{
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등의 행위
-            startProgress();
+            //startProgress();
         }
         @Override
         protected String doInBackground(Void... params) {
@@ -441,7 +447,8 @@ public class ActivityStockOutNew extends BaseActivity{
 
                     if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck=child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityStockOutNew.this, ErrorCheck,2);
                         return;
                     }
 

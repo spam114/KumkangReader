@@ -16,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Adapter.StockOutDetailAdapter;
 import com.example.kumkangreader.Constants;
@@ -261,7 +260,8 @@ public class ActivityStockOut extends BaseActivity{
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if(result != null) {
             if(result.getContents() == null) {
-                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                showErrorDialog(this, "취소 되었습니다.",1);
             }
             else {
                 String scanResult;
@@ -329,7 +329,7 @@ public class ActivityStockOut extends BaseActivity{
                 ContentValues values = new ContentValues();
                 values.put("StockOutNo", stockOut.StockOutNo);
                 values.put("ScanInput", itemTag);
-                values.put("PhoneNumber", Users.PhoneNumber);
+                values.put("PhoneNumber", Users.UserID);
                 SetItemTag sit = new SetItemTag(url, values);
                 sit.execute();
             }
@@ -338,7 +338,7 @@ public class ActivityStockOut extends BaseActivity{
                 ContentValues values = new ContentValues();
                 values.put("StockOutNo", stockOut.StockOutNo);
                 values.put("ScanInput", itemTag);
-                values.put("PhoneNumber", Users.PhoneNumber);
+                values.put("PhoneNumber", Users.UserID);
                 DeleteItemTag dit = new DeleteItemTag(url, values);
                 dit.execute();
             }
@@ -381,7 +381,8 @@ public class ActivityStockOut extends BaseActivity{
 
                 if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck=child.getString("ErrorCheck");
-                    Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(ActivityStockOut.this, ErrorCheck,2);
                     return;
                 }
 
@@ -443,7 +444,8 @@ public class ActivityStockOut extends BaseActivity{
 
                 if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck=child.getString("ErrorCheck");
-                    Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(ActivityStockOut.this, ErrorCheck,2);
                     return;
                 }
                 lastPart=child.getString("PartCode")+"-"+child.getString("PartSpec");
@@ -507,7 +509,8 @@ public class ActivityStockOut extends BaseActivity{
 
                     if(!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck=child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityStockOut.this, ErrorCheck,2);
                         return;
                     }
 
@@ -522,9 +525,10 @@ public class ActivityStockOut extends BaseActivity{
                 listViewInstruction.setAdapter(instructionAdapter);
                 listViewInstruction.setSelection(instructionAdapter.lastPosition);
 
-                if(mode==2)
-                    Toast.makeText(ActivityStockOut.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
-
+                if(mode==2) {
+                    //Toast.makeText(ActivityStockOut.this, "삭제가 완료되었습니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(ActivityStockOut.this, "삭제가 완료되었습니다.",1);
+                }
 
                 int totalQty=0;
                 int totalScanQty=0;

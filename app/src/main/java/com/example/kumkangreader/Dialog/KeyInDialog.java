@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.TextView;
 import android.widget.TimePicker;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
@@ -84,6 +83,11 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
         ApplicationClass.getInstance().progressOFF();
     }
 
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
+    }
+
     public KeyInDialog(Context context, String dialogName, String state, String costCenter, String nonOperationCode) {
         super(context);
         this.context = context;
@@ -146,9 +150,9 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
         btnOK.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String workDate=tyear+"-"+tmonth+"-"+tdate;
-                String startTime=tyear+"-"+tmonth+"-"+tdate+" "+startTimePicker.getCurrentHour()+":"+startTimePicker.getCurrentMinute()+":00";
-                String endTime=tyear+"-"+tmonth+"-"+tdate+" "+endTimePicker.getCurrentHour()+":"+endTimePicker.getCurrentMinute()+":00";
+                String workDate=tyear+"-"+(tmonth+1)+"-"+tdate;
+                String startTime=tyear+"-"+(tmonth+1)+"-"+tdate+" "+startTimePicker.getCurrentHour()+":"+startTimePicker.getCurrentMinute()+":00";
+                String endTime=tyear+"-"+(tmonth+1)+"-"+tdate+" "+endTimePicker.getCurrentHour()+":"+endTimePicker.getCurrentMinute()+":00";
                 setCostCenterStopOperationsByKeyIn(workDate, startTime, endTime);
             }
         });
@@ -165,6 +169,7 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
         values.put("WorkDate", workDate);
         values.put("StartTime", startTime);
         values.put("EndTime", endTime);
+        values.put("UserCode", Users.UserID);
         SetCostCenterStopOperationsByKeyIn gsod = new SetCostCenterStopOperationsByKeyIn(url, values);
         gsod.execute();
     }
@@ -205,12 +210,14 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
 
                 }
-                Toast.makeText(context, "등록 되었습니다.", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(context, "등록 되었습니다.", Toast.LENGTH_SHORT).show();
+                showErrorDialog(context, "등록 되었습니다.",1);
                 KeyInDialog.this.dismiss();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -228,7 +235,7 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
                                                   int year, int monthOfYear, int dayOfMonth) {
                                 txtDate.setText(year + "-" + (monthOfYear + 1) + "-" + dayOfMonth);
                                 tyear=year;
-                                tmonth=monthOfYear+1;
+                                tmonth=monthOfYear;
                                 tdate=dayOfMonth;
                             }
                         }
@@ -237,7 +244,5 @@ public class KeyInDialog extends Dialog implements BaseActivityInterface {
                         year, month, date); // 기본값 연월일
         dpd.show();
     }
-
-
 }
 

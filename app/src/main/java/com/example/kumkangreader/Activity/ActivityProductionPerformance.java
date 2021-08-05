@@ -7,6 +7,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.text.InputType;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -15,7 +16,6 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Adapter.InputAdapter;
 import com.example.kumkangreader.Adapter.OutputAdapter;
@@ -41,6 +41,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     ArrayList<OutputData> outputDataArrayList;
     InputAdapter inputAdapter;//투입 어뎁터
     OutputAdapter outputAdapter;//실적 어뎁터
+    TextView txtIssueTotal;
     TextView txtInputTotal;
     TextView txtScrappedQty;
     TextView txtOutputTotal;
@@ -75,6 +76,7 @@ public class ActivityProductionPerformance extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_production_performance);
+        startProgress();
         this.productionInfoArrayList = (ArrayList<ProductionInfo>) getIntent().getSerializableExtra("productionInfoArrayList");
         this.inputDataArrayList = new ArrayList<>();
         this.outputDataArrayList = new ArrayList<>();
@@ -84,16 +86,19 @@ public class ActivityProductionPerformance extends BaseActivity {
         this.costCenter = getIntent().getStringExtra("costCenter");
         this.costCenterName = getIntent().getStringExtra("costCenterName");
         this.locationNo = getIntent().getStringExtra("locationNo");
+        this.txtIssueTotal=findViewById(R.id.txtIssueTotal);
         this.txtInputTotal = findViewById(R.id.txtInputTotal);
         this.txtOutputTotal = findViewById(R.id.txtOutputTotal);
         this.txtWorksOrderNo = findViewById(R.id.txtWorksOrderNo);
         this.txtRepresent=findViewById(R.id.txtRepresent);
         this.txtWorksOrderNo.setText(worksOrderNo + " / " + costCenterName);
-        this.txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).InputQty)));
-        this.txtOutputTotal.setText(", 발행/생산: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty)) + " / "
-                + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
+
+        //this.txtInputTotal.setText("총투입: " + String.format("%,d", Integer.parseInt(this.productionInfoArrayList.get(0).InputQty))+"("+
+               // String.format("%,d", Integer.parseInt(this.productionInfoArrayList.get(0).InputQtyBD))+")");
+        //this.txtOutputTotal.setText(", 발행/생산: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).IssueOutputQty)) + " / "
+                //+ String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).OutputQty)));
         this.txtScrappedQty=findViewById(R.id.txtScrappedQty);
-        this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
+        //this.txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(this.productionInfoArrayList.get(0).ScrappedQty)));
         this.txtRepresent.setText(this.productionInfoArrayList.get(0).PartName+"("+this.productionInfoArrayList.get(0).PartSpecName+")");
         this.edtScan=findViewById(R.id.edtScan);
         this.centerSpec=this.productionInfoArrayList.get(0).CenterSpec;
@@ -118,10 +123,10 @@ public class ActivityProductionPerformance extends BaseActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if(hasFocus){
-                    edtScan.setGravity(Gravity.START);
+                    edtScan.setGravity(Gravity.CENTER_VERTICAL|Gravity.START);
                 }
                 else{
-                    edtScan.setGravity(Gravity.CENTER_HORIZONTAL);
+                    edtScan.setGravity(Gravity.CENTER_VERTICAL|Gravity.CENTER_HORIZONTAL);
                 }
             }
         });
@@ -187,7 +192,8 @@ public class ActivityProductionPerformance extends BaseActivity {
 
         else if (result != null) {
             if (result.getContents() == null) {
-                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                //Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                showErrorDialog(this, "취소 되었습니다.",1);
             } else {
                 String scanResult;
                 scanResult = result.getContents();
@@ -227,7 +233,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("LocationNo", locationNo);*/
         values.put("ItemTag", itemTag);
         values.put("CostCenter", costCenter);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         JudgeInputOutput gsod = new JudgeInputOutput(url, values);
         gsod.execute();
     }
@@ -277,7 +283,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     inputData = new InputData(
@@ -296,15 +303,15 @@ public class ActivityProductionPerformance extends BaseActivity {
                 }
 
                 if(this.itemTag.equals(""))
-                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, costCenter, mHandler);
+                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, worksOrderNo, costCenter, mHandler);
                 else{
-                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, this.itemTag, costCenter, mHandler);
+                    inputAdapter = new InputAdapter(ActivityProductionPerformance.this, R.layout.listview_input_row, inputDataArrayList, this.itemTag, worksOrderNo,costCenter, mHandler);
                 }
                 getOutputData(itemTag2, itemTagForDirect);//생산정보 가져오기
                 listViewInput.setAdapter(inputAdapter);
                 //listViewInput.setCacheColorHint(Color.TRANSPARENT);
                 listViewInput.setSelection(inputDataArrayList.size()-1);
-                progressOFF();
+                //progressOFF();
 
             } catch (Exception e) {
                 e.printStackTrace();
@@ -359,7 +366,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     outputData = new OutputData(
@@ -377,14 +385,14 @@ public class ActivityProductionPerformance extends BaseActivity {
 
                 }
                 if(this.itemTag.equals(""))
-                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, costCenter, mHandler);
+                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, worksOrderNo, costCenter, mHandler);
                 else
-                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag, costCenter, mHandler);
+                    outputAdapter = new OutputAdapter(ActivityProductionPerformance.this, R.layout.listview_output_row, outputDataArrayList, this.itemTag, worksOrderNo, costCenter, mHandler);
                 listViewOutput.setAdapter(outputAdapter);
                 //listViewOutput.setCacheColorHint(Color.TRANSPARENT);
                 //listViewOutput.setSelection(outputAdapter.lastPosition);
                 listViewOutput.setSelection(outputDataArrayList.size()-1);
-                progressOFF();
+                //progressOFF();
                 getProductionBasicInfo(itemTagForDirect);
 
 
@@ -403,6 +411,8 @@ public class ActivityProductionPerformance extends BaseActivity {
     public Handler mHandler = new Handler() { //다이얼로그 종료시 액티비티 데이터 전송을 위함
         @Override
         public void handleMessage(Message msg) {
+
+            showErrorDialog(ActivityProductionPerformance.this, "데이터가 반영 되었습니다.",1);
             getInputData("","", "");
 
         }
@@ -453,39 +463,70 @@ public class ActivityProductionPerformance extends BaseActivity {
                 ProductionInfo productionInfo;
                 JSONArray jsonArray = new JSONArray(result);
                 String ErrorCheck = "";
+                int centerType=0;
                 productionInfoArrayList=new ArrayList<>();
                 for (int i = 0; i < jsonArray.length(); i++) {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     productionInfo = new ProductionInfo(
                             child.getString("OutputQty"),
+                            child.getString("OutputQtyBD"),
                             child.getString("CostCenter"),
                             child.getString("CostCenterName"),
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
+                            child.getString("InputQtyBD"),
                             child.getString("IssueOutputQty"),
+                            child.getString("IssueOutputQtyBD"),
                             child.getString("LocationNo"),
                             child.getString("ScrappedQty"),
                             child.getString("CenterSpec"),
                             child.getString("PartName"),
                             child.getString("PartSpecName")
                     );
-
+                    centerType=Integer.parseInt(child.getString("CenterSpec"));
                     productionInfoArrayList.add(productionInfo);
                 }
                 worksOrderNo=productionInfoArrayList.get(0).WorksOrderNo;
                 costCenterName=productionInfoArrayList.get(0).CostCenterName;
 
                 txtWorksOrderNo.setText(worksOrderNo + " / " + costCenterName);
-                txtInputTotal.setText("투입: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).InputQty)));
-                txtOutputTotal.setText(", 발행/생산: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).IssueOutputQty)) + " / "
-                        + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).OutputQty)));
-                txtScrappedQty.setText("불량: " + String.format("%.0f", Double.parseDouble(productionInfoArrayList.get(0).ScrappedQty)));
+                txtIssueTotal.setText("총발행: " + String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).IssueOutputQty))+
+                        "("+String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).IssueOutputQtyBD))+")");
+
+                txtScrappedQty.setText("불량: " + String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).ScrappedQty)));
+
                 txtRepresent.setText(productionInfoArrayList.get(0).PartName+"("+productionInfoArrayList.get(0).PartSpecName+")");
+
+                int todayInput=0;
+                int todayInputBD=inputDataArrayList.size();
+                for(int i=0;i<inputDataArrayList.size();i++){
+                    todayInput+=Integer.parseInt(inputDataArrayList.get(i).Qty);
+                }
+
+                int todayOutput=0;
+                int todayOutputBD=outputDataArrayList.size();
+
+                for(int i=0;i<outputDataArrayList.size();i++){
+                    todayOutput+=Integer.parseInt(outputDataArrayList.get(i).Qty);
+                }
+
+                txtInputTotal.setText("총투입: " + String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).InputQty))+
+                        "("+String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).InputQtyBD))+")"
+                        +", 당일: "+String.format("%,d", todayInput)+"("+String.format("%,d", todayInputBD)+")");
+
+                txtOutputTotal.setText("총생산: " + String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).OutputQty))+
+                        "("+String.format("%,d", Integer.parseInt(productionInfoArrayList.get(0).OutputQtyBD))+")"
+                        +", 당일: "+String.format("%,d", todayOutput)+"("+String.format("%,d", todayOutputBD)+")");
+
+                if(centerType==1){//작업장 코일이면 입력 키패드 문자까지
+                    edtScan.setInputType(InputType.TYPE_CLASS_TEXT);
+                }
 
                 if(!itemTagForDirect.equals("")){//바로등록
                     judgeInputOutput(itemTagForDirect);
@@ -494,11 +535,9 @@ public class ActivityProductionPerformance extends BaseActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
-                progressOFF();
             }
             finally {
-
-
+                progressOFF();
             }
 
         }
@@ -546,7 +585,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     else if(!child.getString("CoilNo").equals("null")){//중복된 코일이 존재한다.
@@ -599,7 +639,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                 } else if (type == 2) {//Output: 생산실적
                     setOutputData(values.get("ItemTag").toString());
                 } else {
-                    Toast.makeText(getBaseContext(), "투입, 실적 TAG정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(getBaseContext(), "투입, 실적 TAG정보가 없습니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(ActivityProductionPerformance.this, "투입, 실적 TAG정보가 없습니다.",2);
                     //progressOFF();
                     return;
                 }
@@ -622,7 +663,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("LocationNo", locationNo);
         values.put("ItemTag", scanResult);
         values.put("WorkClassCode", Users.WorkClassCode);//작업조: 기본셋팅 A 추후 변경
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         SetInputData gsod = new SetInputData(url, values);
         gsod.execute();
     }
@@ -667,7 +708,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     itemTag=child.getString("ItemTag");
@@ -704,7 +746,7 @@ public class ActivityProductionPerformance extends BaseActivity {
         values.put("LocationNo", locationNo);
         values.put("ItemTag", scanResult);
         values.put("WorkClassCode", Users.WorkClassCode);//작업조: 기본셋팅 A 추후 변경
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         SetOutputData gsod = new SetOutputData(url, values);
         gsod.execute();
     }
@@ -749,7 +791,8 @@ public class ActivityProductionPerformance extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityProductionPerformance.this, ErrorCheck,2);
                         return;
                     }
                     itemTag=child.getString("ItemTag");

@@ -4,7 +4,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Adapter.ScrapAdapter;
 import com.example.kumkangreader.Object.ScrapData;
@@ -18,6 +17,7 @@ public class ActivityScrap extends BaseActivity {
     ListView listViewScrap;
     ScrapAdapter scrapAdapter;
     String itemTag;
+    String worksOrderNo;
     String costCenter;
 
     public void startProgress() {
@@ -36,9 +36,10 @@ public class ActivityScrap extends BaseActivity {
         setContentView(R.layout.activity_scrap);
 
         this.itemTag=getIntent().getStringExtra("itemTag");
+        this.worksOrderNo=getIntent().getStringExtra("worksOrderNo");
         this.costCenter=getIntent().getStringExtra("costCenter");
         this.scrapDataArrayList = (ArrayList<ScrapData>) getIntent().getSerializableExtra("scrapDataArrayList");
-        this.scrapAdapter=new ScrapAdapter(ActivityScrap.this, R.layout.listview_scrap_row, scrapDataArrayList, this.itemTag, this.costCenter, mHandler);
+        this.scrapAdapter=new ScrapAdapter(ActivityScrap.this, R.layout.listview_scrap_row, scrapDataArrayList, this.itemTag, worksOrderNo,this.costCenter, mHandler);
         this.listViewScrap=findViewById(R.id.listviewScrap);
         this.listViewScrap.setAdapter(this.scrapAdapter);
     }
@@ -48,10 +49,11 @@ public class ActivityScrap extends BaseActivity {
         public void handleMessage(Message msg) {
             scrapDataArrayList = (ArrayList<ScrapData>)msg.getData().getSerializable("scrapDataArrayList");
             if(scrapDataArrayList.size()==0){
-                Toast.makeText(ActivityScrap.this, "등록 된 불량품이 없습니다.", Toast.LENGTH_SHORT).show();
+                showErrorDialog(ActivityScrap.this, "등록 된 불량품이 없습니다.",2);
+                //Toast.makeText(ActivityScrap.this, "등록 된 불량품이 없습니다.", Toast.LENGTH_SHORT).show();
                 finish();
             }
-            scrapAdapter=new ScrapAdapter(ActivityScrap.this, R.layout.listview_scrap_row, scrapDataArrayList, itemTag, costCenter, mHandler);
+            scrapAdapter=new ScrapAdapter(ActivityScrap.this, R.layout.listview_scrap_row, scrapDataArrayList, itemTag, worksOrderNo,costCenter, mHandler);
             listViewScrap.setAdapter(scrapAdapter);
         }
     };

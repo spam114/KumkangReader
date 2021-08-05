@@ -11,7 +11,6 @@ import android.os.Message;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.Button;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -45,6 +44,7 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
     Button btnCancel;
 
     String itemTag;
+    String worksOrderNo;
     String costCenter;
     Handler mHandler;
 
@@ -54,10 +54,11 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
 
     //ScrapDeleteDialog2.OnDialogResult mDialogResult
 
-    public ScrapDeleteDialog2(@NonNull Context context, String itemTag, String costCenter, Handler mHandler) {
+    public ScrapDeleteDialog2(@NonNull Context context, String itemTag, String worksOrderNo, String costCenter, Handler mHandler) {
         super(context);
         this.context=context;
         this.itemTag=itemTag;
+        this.worksOrderNo=worksOrderNo;
         this.costCenter=costCenter;
         this.mHandler=mHandler;
     }
@@ -160,7 +161,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
 
@@ -188,7 +190,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                 }
 
                 if(scrapDataArrayList.size()==0){
-                    Toast.makeText(context, "삭제할 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(context, "삭제할 데이터가 없습니다.", Toast.LENGTH_SHORT).show();
+                    showErrorDialog(context, "삭제할 데이터가 없습니다.",2);
                     dismiss();
                     return;
                 }
@@ -196,6 +199,7 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                 Intent i = new Intent(context, ActivityScrap.class);
                 i.putExtra("scrapDataArrayList", scrapDataArrayList);
                 i.putExtra("itemTag",itemTag);
+                i.putExtra("worksOrderNo",worksOrderNo);
                 i.putExtra("costCenter",costCenter);
 
                 //context.startActivity(i);
@@ -261,7 +265,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
 
@@ -335,7 +340,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     ScrapCode scrapCode= new ScrapCode(
@@ -405,7 +411,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                     ScrapGrade scrapGrade= new ScrapGrade(
@@ -417,7 +424,7 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     scrapGradeArrayList.add(scrapGrade);
                 }
 
-                DialogInsertScrap sdd = new DialogInsertScrap(context, outputData, scrapCodeArrayList, scrapGradeArrayList, mHandler);
+                DialogInsertScrap sdd = new DialogInsertScrap(context, outputData, scrapCodeArrayList, scrapGradeArrayList, mHandler, worksOrderNo, costCenter);
                 //sdd.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
                 sdd.getWindow().setBackgroundDrawableResource(R.drawable.dialog_rounded_background);
                 sdd.show();
@@ -449,8 +456,9 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
         String url = context.getString(R.string.service_address) + "deleteOutputData";
         ContentValues values = new ContentValues();
         values.put("ItemTag", itemTag);
+        values.put("WorksOrderNo", worksOrderNo);
         values.put("CostCenter", costCenter);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         DeleteOutputData gsod = new DeleteOutputData(url, values);
         gsod.execute();
     }
@@ -493,7 +501,8 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                 }
@@ -531,5 +540,10 @@ public class ScrapDeleteDialog2 extends Dialog implements BaseActivityInterface 
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 }

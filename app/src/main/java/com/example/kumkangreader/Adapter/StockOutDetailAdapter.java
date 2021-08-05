@@ -135,6 +135,11 @@ public class StockOutDetailAdapter extends ArrayAdapter<StockOutDetail> implemen
         ApplicationClass.getInstance().progressOFF();
     }
 
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
+    }
+
     private void startProgress() {
 
         progressON("Loading...");

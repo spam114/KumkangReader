@@ -51,7 +51,7 @@
                             <TextView
                                 android:id="@+id/txtWorksOrderNo"
                                 android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
+                                android:layout_height="match_parent"
                                 android:text="발주번호"
                                 android:textColor="#000000"
                                 android:textStyle="bold" />
@@ -71,18 +71,12 @@
                             android:orientation="horizontal">
 
                             <TextView
-                                android:id="@+id/txtInputTotal"
+                                android:id="@+id/txtIssueTotal"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="총투입"
-                                android:textColor="#000000" />
-
-                            <TextView
-                                android:id="@+id/txtOutputTotal"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:text="총생산"
-                                android:textColor="#000000" />
+                                android:text="총발행"
+                                android:textColor="#2962FF"
+                                android:textStyle="bold" />
 
                         </LinearLayout>
 
@@ -96,7 +90,8 @@
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
                                 android:text="불량수량"
-                                android:textColor="#000000" />
+                                android:textColor="#D50000"
+                                android:textStyle="bold" />
                         </LinearLayout>
 
                     </LinearLayout>
@@ -127,27 +122,28 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_gravity="center"
-        android:layout_weight="0.5"
-        android:gravity="center_vertical"
+        android:layout_weight="0.8"
         android:focusable="true"
         android:focusableInTouchMode="true"
+        android:gravity="center_vertical"
         android:orientation="horizontal">
 
         <com.google.android.material.textfield.TextInputEditText
             android:id="@+id/edtScan"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center_horizontal"
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"
             android:hint="인식 불가 시 입력하세요"
-            android:singleLine="true"
             android:imeOptions="actionDone"
-            android:textSize="13sp" />
+            android:inputType="number"
+            android:singleLine="true"
+            android:textSize="16sp" />
     </LinearLayout>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4.1"
+        android:layout_weight="3.95"
         android:background="@drawable/borderline"
         android:orientation="vertical"
         android:weightSum="10">
@@ -161,13 +157,14 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/txtInput"
+                android:id="@+id/txtInputTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="투입"
-                android:textColor="#000000" />
+                android:textColor="#2962FF"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -212,7 +209,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3.5"
                 android:gravity="center"
-                android:text="수량"
+                android:text="수량(EA)"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>
@@ -228,7 +225,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="4.1"
+        android:layout_weight="3.95"
         android:orientation="vertical"
         android:weightSum="10">
 
@@ -241,13 +238,14 @@
             android:orientation="horizontal">
 
             <TextView
-                android:id="@+id/txtOutPut"
+                android:id="@+id/txtOutputTotal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
                 android:text="생산실적(당일)"
-                android:textColor="#000000" />
+                android:textColor="#2962FF"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -292,7 +290,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="3.5"
                 android:gravity="center"
-                android:text="수량(불량)"
+                android:text="수량"
                 android:textColor="#FFFFFF" />
 
         </LinearLayout>

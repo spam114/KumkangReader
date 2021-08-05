@@ -20,7 +20,6 @@ import android.widget.LinearLayout;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Object.Bin;
 import com.example.kumkangreader.Object.Users;
@@ -128,7 +127,8 @@ public class ActivityMoveCoil extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityMoveCoil.this, ErrorCheck,2);
                         return;
                     }
                     double weight = Double.parseDouble(child.getString("Weight"));
@@ -361,8 +361,9 @@ public class ActivityMoveCoil extends BaseActivity {
             tr_date.addView(tvNo);
         }*/
         } catch (Exception e) {
-            String sdf = e.getStackTrace().toString();
-            Toast.makeText(ActivityMoveCoil.this, sdf, Toast.LENGTH_SHORT).show();
+            String sdf = e.getMessage().toString();
+            //Toast.makeText(ActivityMoveCoil.this, sdf, Toast.LENGTH_SHORT).show();
+            showErrorDialog(ActivityMoveCoil.this, sdf,2);
 
         }
     }
@@ -402,7 +403,8 @@ public class ActivityMoveCoil extends BaseActivity {
                                     }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            Toast.makeText(ActivityMoveCoil.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ActivityMoveCoil.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                            showErrorDialog(ActivityMoveCoil.this, "취소 되었습니다.",1);
                         }
                     }).show();
 
@@ -421,7 +423,7 @@ public class ActivityMoveCoil extends BaseActivity {
         values.put("CoilNo", coilNo);
         values.put("PartCode", partCode);
         values.put("PartSpec", partSpec);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         MoveCoil gsod = new MoveCoil(url, values);
         gsod.execute();
     }
@@ -464,7 +466,8 @@ public class ActivityMoveCoil extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityMoveCoil.this, ErrorCheck,2);
                         return;
                     }
                 }

@@ -14,7 +14,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 
@@ -53,15 +52,20 @@ public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
     ArrayList<ScrapGrade> scrapGradeArrayList;
     Handler mHandler;
 
+    String worksOrderNo;
+    String costCenter;
+
     //ScrapDeleteDialog2.OnDialogResult mDialogResult
 
-    public DialogInsertScrap(@NonNull Context context, OutputData outputData, ArrayList<ScrapCode> scrapCodeArrayList, ArrayList<ScrapGrade> scrapGradeArrayList, Handler mHandler) {
+    public DialogInsertScrap(@NonNull Context context, OutputData outputData, ArrayList<ScrapCode> scrapCodeArrayList, ArrayList<ScrapGrade> scrapGradeArrayList, Handler mHandler, String worksOrderNo, String costCenter) {
         super(context);
         this.context=context;
         this.outputData=outputData;
         this.scrapCodeArrayList=scrapCodeArrayList;
         this.scrapGradeArrayList=scrapGradeArrayList;
         this.mHandler=mHandler;
+        this.worksOrderNo=worksOrderNo;
+        this.costCenter=costCenter;
     }
 
     @Override
@@ -140,7 +144,10 @@ public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
         values.put("Qty", this.edtQty.getText().toString());
         values.put("ScrapCode", this.spinnerScrapCode.getSelectedItem().toString());
         values.put("ScrapGrade", this.spinnerScrapGrade.getSelectedItem().toString());
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
+
+        values.put("WorksOrderNo", worksOrderNo);
+        values.put("CostCenter", costCenter);
         SetScrap gsod = new SetScrap(url, values);
         gsod.execute();
     }
@@ -183,7 +190,8 @@ public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(context, ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(context, ErrorCheck,2);
                         return;
                     }
                 }
@@ -238,5 +246,10 @@ public class DialogInsertScrap extends Dialog implements BaseActivityInterface {
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 }

@@ -1,6 +1,7 @@
 package com.example.kumkangreader;
 
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,7 +17,6 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
-import com.example.kumkangreader.Activity.ActivityInventorySurvey;
 import com.example.kumkangreader.Activity.ActivityMoveCoil2;
 import com.example.kumkangreader.Activity.ActivityProductionPerformance;
 import com.example.kumkangreader.Activity.ActivityStockOutNew;
@@ -90,8 +90,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         imageView5=findViewById(R.id.imageView5);
         textView7=findViewById(R.id.textView7);//테스트용
 
-        if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
-            textView7.setText(" 재고조사(선택)");
+        /*if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
+            textView7.setText(" 재고조사(클릭)");
         }
 
         textView7.setOnClickListener(new View.OnClickListener() {
@@ -102,7 +102,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     startActivity(i);
                 }
             }
-        });
+        });*/
 
         //테스트용
         imageView5.setOnClickListener(new View.OnClickListener() {
@@ -174,15 +174,20 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         tabs2.addTab(topTab);
         tabs2.addTab(topTab2);*/
 
+        firstTab.view.setClickable(false);
+        secondTab.view.setClickable(false);
+        thirdTab.view.setClickable(false);
+        fourthTab.view.setClickable(false);
 
         if (Users.authorityList.contains(0) || Users.authorityList.contains(1)) {//0:관리자 1:생산
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragmentProduction).commit();//첫실행 fragment
-            firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
-            secondTab.setIcon(R.drawable.baseline_build_black_48dp);
-            thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);
-            fourthTab.setIcon(R.drawable.outline_do_not_disturb_on_black_24);
+            firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);//코일입고
+            secondTab.setIcon(R.drawable.baseline_build_black_48dp);//생산실적
+            thirdTab.setIcon(R.drawable.outline_local_shipping_black_48dp);//출고등록
+            fourthTab.setIcon(R.drawable.outline_do_not_disturb_on_black_24);//비가동
             tabs.selectTab(secondTab);
-        } else if (Users.authorityList.contains(2)) {//2:출고권한만 가졌을시
+        }
+        else if (Users.authorityList.contains(2)) {//2:출고권한만 가졌을시
             getSupportFragmentManager().beginTransaction().add(R.id.container, fragmentStockOut).commit();//첫실행 fragment
             firstTab.setIcon(R.drawable.outline_donut_small_black_48dp);
             secondTab.setIcon(R.drawable.outline_build_black_48dp);
@@ -191,6 +196,21 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             tabs.selectTab(thirdTab);
         }
 
+
+        if(Users.authorityList.contains(0)){
+            firstTab.view.setClickable(true);
+            secondTab.view.setClickable(true);
+            thirdTab.view.setClickable(true);
+            fourthTab.view.setClickable(true);
+        }
+        if(Users.authorityList.contains(1)){
+            firstTab.view.setClickable(true);
+            secondTab.view.setClickable(true);
+            fourthTab.view.setClickable(true);
+        }
+        if(Users.authorityList.contains(2)){
+            thirdTab.view.setClickable(true);
+        }
 
 
         /*tabs.addTab(tabs.newTab().setText("출하"));*/
@@ -315,17 +335,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 intentIntegrator.initiateScan();
             }
         });
-
-
-
-
     }
-
-
-
-
-
-
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -337,14 +347,16 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             this.scanDataArrayList = new ArrayList<>();*/
         }
         if(testFlag){
-            Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
+            //Toast.makeText(this, result.getContents(), Toast.LENGTH_LONG).show();
+            showErrorDialog(this, result.getContents(),2);
             testFlag=false;
             return;
         }
 
         if (result != null) {
             if (result.getContents() == null) {
-                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                //showErrorDialog(this, "취소 되었습니다.",1);
             } else {
                 String scanResult;
                 scanResult = result.getContents();
@@ -355,7 +367,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     try {
                         judgeItemTagOrWorksOrder(scanResult);
                     } catch (ArrayIndexOutOfBoundsException aoe) {
-                        Toast.makeText(this, "사용 불가능한 TAG 입니다.", Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(this, "사용 불가능한 TAG 입니다.", Toast.LENGTH_SHORT).show();
+                        showErrorDialog(this, "사용 불가능한 TAG 입니다.",2);
                         progressOFF();
                     }
                     finally {
@@ -422,12 +435,13 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
-                    Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(MainActivity2.this, ErrorCheck,2);
                     return;
                 }
                 type = child.getString("Type");
 
-                if(type.equals("1")){
+                if(type.equals("1")){//바로실적 가능
                     getProductionBasicInfo(child.getString("WorksOrderNo")+"/"+child.getString("CostCenter"), child.getString("ItemTag"));
                 }
                 else{
@@ -435,7 +449,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 }
             }
             catch (ArrayIndexOutOfBoundsException aoe){
-                Toast.makeText(MainActivity2.this, "사용 불가능한 TAG 입니다.", Toast.LENGTH_SHORT).show();
+                showErrorDialog(MainActivity2.this, "사용 불가능한 TAG 입니다.",2);
             }
             catch (Exception e) {
                 e.printStackTrace();
@@ -453,7 +467,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         ContentValues values = new ContentValues();
         values.put("CoilNo", scanResult);
         values.put("BusinessClassCode", "2");
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         values.put("Zone", "A");//초기화면 zone A
         InputCoil gsod = new InputCoil(url, values);
         gsod.execute();
@@ -508,7 +522,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
-                    Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    //Toast.makeText(MainActivity2.this, ErrorCheck, Toast.LENGTH_SHORT).show();
+                    showErrorDialog(MainActivity2.this, ErrorCheck,2);
                     return;
                 }
                 StockOutNo = child.getString("StockOutNo");
@@ -582,7 +597,8 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(MainActivity2.this, ErrorCheck,2);
                         return;
                     }
                     else if(!child.getString("DuplicatedCoilNo").equals("null")){//중복된 코일이 존재한다.
@@ -629,6 +645,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 startActivity(i);
 
                 Toast.makeText(getBaseContext(), "코일 입고가 완료되었습니다.\n적재위치를 선택하여 주세요.", Toast.LENGTH_LONG).show();
+                //showErrorDialog(MainActivity2.this, "코일 입고가 완료되었습니다.\n적재위치를 선택하여 주세요.",1);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
@@ -670,7 +687,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -700,16 +717,20 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(MainActivity2.this, ErrorCheck,2);
                         return;
                     }
                     productionInfo = new ProductionInfo(
                             child.getString("OutputQty"),
+                            child.getString("OutputQtyBD"),
                             child.getString("CostCenter"),
                             child.getString("CostCenterName"),
                             child.getString("WorksOrderNo"),
                             child.getString("InputQty"),
+                            child.getString("InputQtyBD"),
                             child.getString("IssueOutputQty"),
+                            child.getString("IssueOutputQtyBD"),
                             child.getString("LocationNo"),
                             child.getString("ScrappedQty"),
                             child.getString("CenterSpec"),
@@ -743,7 +764,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                progressOFF();
+                //progressOFF();
             }
 
         }
@@ -767,6 +788,11 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 
 

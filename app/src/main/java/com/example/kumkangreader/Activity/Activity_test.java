@@ -13,7 +13,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
-import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
@@ -50,7 +49,7 @@ public class Activity_test extends AppCompatActivity {
         spiner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getApplicationContext(), "Selected Floor: " + floor[position], Toast.LENGTH_SHORT).show(); // 선택한 층을 메시지박스로 보여준다.
+                //Toast.makeText(getApplicationContext(), "Selected Floor: " + floor[position], Toast.LENGTH_SHORT).show(); // 선택한 층을 메시지박스로 보여준다.
             }
 
             @Override

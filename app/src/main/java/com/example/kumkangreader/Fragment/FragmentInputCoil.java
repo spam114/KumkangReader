@@ -16,7 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Activity.ActivityCoilStock;
 import com.example.kumkangreader.Activity.ActivityMoveCoil2;
+import com.example.kumkangreader.Activity.ActivityViewCoil;
+import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.MainActivity2;
 import com.example.kumkangreader.R;
@@ -27,6 +30,8 @@ public class FragmentInputCoil extends Fragment implements BaseActivityInterface
     TextInputEditText edtScan;
     Context context;
     Button btnMoveCoil;
+    Button btnViewCoil;
+    Button btnStock;
 
     public FragmentInputCoil(){
 
@@ -75,6 +80,24 @@ public class FragmentInputCoil extends Fragment implements BaseActivityInterface
             }
         });
 
+        this.btnViewCoil=rootView.findViewById(R.id.btnViewCoil);
+        this.btnViewCoil.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityViewCoil.class);
+                startActivity(i);
+            }
+        });
+
+        this.btnStock=rootView.findViewById(R.id.btnStock);
+        this.btnStock.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityCoilStock.class);
+                startActivity(i);
+            }
+        });
+
         return rootView;
     }
 
@@ -97,5 +120,10 @@ public class FragmentInputCoil extends Fragment implements BaseActivityInterface
     @Override
     public void progressOFF() {
 
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 }

@@ -2,6 +2,7 @@ package com.example.kumkangreader.Fragment;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Gravity;
@@ -10,12 +11,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.example.kumkangreader.Activity.ActivityViewProduction;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.MainActivity2;
@@ -25,7 +28,7 @@ import com.google.android.material.textfield.TextInputEditText;
 public class FragmentProduction extends Fragment implements BaseActivityInterface {
     TextInputEditText edtScan;
     Context context;
-
+    Button btnViewData;
     public FragmentProduction(){
 
     }
@@ -74,7 +77,14 @@ public class FragmentProduction extends Fragment implements BaseActivityInterfac
             }
         });
 
-
+        this.btnViewData=rootView.findViewById(R.id.btnViewData);
+        this.btnViewData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent i = new Intent(context, ActivityViewProduction.class);
+                startActivity(i);
+            }
+        });
         return rootView;
     }
 
@@ -98,5 +108,10 @@ public class FragmentProduction extends Fragment implements BaseActivityInterfac
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }
 }

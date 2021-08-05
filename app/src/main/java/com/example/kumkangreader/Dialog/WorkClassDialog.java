@@ -114,4 +114,9 @@ public class WorkClassDialog extends Dialog implements BaseActivityInterface {
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
     }
+
+    @Override
+    public void showErrorDialog(Context context, String message, int type) {
+        ApplicationClass.getInstance().showErrorDialog(context, message, type);
+    }
 }

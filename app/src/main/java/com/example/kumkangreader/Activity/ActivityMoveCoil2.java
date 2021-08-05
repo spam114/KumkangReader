@@ -25,7 +25,6 @@ import android.widget.Spinner;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.kumkangreader.Object.Bin;
 import com.example.kumkangreader.Object.Users;
@@ -71,9 +70,9 @@ public class ActivityMoveCoil2 extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_move_coil2);
+        startProgress();
         textSize=Users.ScreenInches*2;
         this.txtSelectedCoil=findViewById(R.id.txtSelectedCoil);
-
         //잠깐주석
         binArrayList=new ArrayList<>();
         this.selectedCoil="";
@@ -167,7 +166,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -191,7 +190,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityMoveCoil2.this, ErrorCheck,2);
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     maxRow = Integer.parseInt(child.getString("MaxRow"));
@@ -203,7 +203,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                progressOFF();
+
             }
 
         }
@@ -258,7 +258,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityMoveCoil2.this, ErrorCheck,2);
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
                     double weight = Double.parseDouble(child.getString("Weight"));
@@ -495,8 +496,9 @@ public class ActivityMoveCoil2 extends BaseActivity {
             tr_date.addView(tvNo);
         }*/
         } catch (Exception e) {
-            String sdf = e.getStackTrace().toString();
-            Toast.makeText(ActivityMoveCoil2.this, sdf, Toast.LENGTH_SHORT).show();
+            String sdf = e.getMessage().toString();
+            //Toast.makeText(ActivityMoveCoil2.this, sdf, Toast.LENGTH_SHORT).show();
+            showErrorDialog(ActivityMoveCoil2.this, sdf,2);
 
         }
     }
@@ -514,7 +516,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                         //여기만적용
 
                         if(firstInputCoil){
-                            Toast.makeText(ActivityMoveCoil2.this, "이미 코일이 적재되어 있습니다.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ActivityMoveCoil2.this, "이미 코일이 적재되어 있습니다.", Toast.LENGTH_SHORT).show();
+                            showErrorDialog(ActivityMoveCoil2.this, "이미 코일이 적재되어 있습니다.",2);
                             return;
                         }
                         SelectCoilData(bin.LinkCode, bin.PartCode, bin.PartSpec);
@@ -522,7 +525,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     }
                     else{//데이터가 들어가있지 않다면
                         if(selectedCoil.equals("")){//선택안한상태
-                            Toast.makeText(ActivityMoveCoil2.this, "이동할 코일을 선택하여 주세요.", Toast.LENGTH_SHORT).show();
+                            //Toast.makeText(ActivityMoveCoil2.this, "이동할 코일을 선택하여 주세요.", Toast.LENGTH_SHORT).show();
+                            showErrorDialog(ActivityMoveCoil2.this, "이동할 코일을 선택하여 주세요.",2);
                             getBin();
                         }
                         else{//선택한상태
@@ -541,7 +545,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                                             }).setNegativeButton("취소", new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
-                                    Toast.makeText(ActivityMoveCoil2.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                                    //Toast.makeText(ActivityMoveCoil2.this, "취소 되었습니다.", Toast.LENGTH_SHORT).show();
+                                    showErrorDialog(ActivityMoveCoil2.this, "취소 되었습니다.",1);
                                 }
                             }).show();
                         }
@@ -561,7 +566,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
         values.put("CoilNo", coilNo);
         values.put("PartCode", partCode);
         values.put("PartSpec", partSpec);
-        values.put("UserCode", Users.PhoneNumber);
+        values.put("UserCode", Users.UserID);
         MoveCoil gsod = new MoveCoil(url, values);
         gsod.execute();
     }
@@ -580,7 +585,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            startProgress();
+            //startProgress();
         }
 
         @Override
@@ -604,7 +609,8 @@ public class ActivityMoveCoil2 extends BaseActivity {
                     JSONObject child = jsonArray.getJSONObject(i);
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
-                        Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
+                        showErrorDialog(ActivityMoveCoil2.this, ErrorCheck,2);
                         return;
                     }
                 }
@@ -615,7 +621,7 @@ public class ActivityMoveCoil2 extends BaseActivity {
                 e.printStackTrace();
             } finally {
                 getBin();
-                progressOFF();
+                //progressOFF();
             }
 
         }
