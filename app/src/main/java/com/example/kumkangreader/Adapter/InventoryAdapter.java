@@ -18,6 +18,7 @@ import android.widget.TextView;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Interface.BaseActivityInterface;
 import com.example.kumkangreader.Object.Inventory;
+import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
@@ -80,7 +81,7 @@ public class InventoryAdapter extends ArrayAdapter<Inventory> implements BaseAct
             txtQty.setText(qty);
 
             TextView txtSeqNo = (TextView) row.findViewById(R.id.txtSeqNo);
-            txtSeqNo.setText(((Inventory) data.get(position)).SeqNo);
+            txtSeqNo.setText(((Inventory) data.get(position)).RowSeqNo);
 
             LinearLayout detailLayout = row.findViewById(R.id.detailLayout);
 
@@ -125,6 +126,7 @@ public class InventoryAdapter extends ArrayAdapter<Inventory> implements BaseAct
         String url = context.getString(R.string.service_address) + "deleteInventorySurvey";
         ContentValues values = new ContentValues();
         values.put("ItemTag", itemTag);
+        values.put("SeqNo", Users.SeqNo);
         DeleteInventorySurvey gsod = new DeleteInventorySurvey(url, values);
         gsod.execute();
     }
@@ -203,6 +205,16 @@ public class InventoryAdapter extends ArrayAdapter<Inventory> implements BaseAct
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+    @Override
+    public void progressON(String message, Handler handler) {
+        ApplicationClass.getInstance().progressON((Activity)context, message, handler);
+    }
+
+    @Override
+    public void progressOFF2() {
+        ApplicationClass.getInstance().progressOFF2();
     }
 
     @Override

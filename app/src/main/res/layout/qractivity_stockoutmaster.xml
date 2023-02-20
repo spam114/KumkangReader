@@ -5,13 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+
     <com.journeyapps.barcodescanner.DecoratedBarcodeView
         android:id="@+id/db_qr"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        app:zxing_scanner_layout="@layout/view_qrcode">
-    </com.journeyapps.barcodescanner.DecoratedBarcodeView>
-
+        app:zxing_scanner_layout="@layout/view_qrcode"></com.journeyapps.barcodescanner.DecoratedBarcodeView>
 
     <Button
         android:id="@+id/btnFlash"
@@ -20,9 +19,9 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_marginTop="10dip"
-        android:layout_marginRight="10dip"
-        android:background="@null"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@color/transparent_blue"
         android:onClick="switchFlashlight"
         android:padding="7dp"
         android:scaleType="fitXY"
@@ -36,7 +35,7 @@
         android:layout_marginLeft="20dip"
         android:layout_marginTop="20dip"
         android:background="@color/zxing_transparent"
-        android:text="@string/qr_state_stockoutmaster"
+        android:text="태그를 인식해주세요."
         android:textColor="@color/zxing_status_text" />
 
 </RelativeLayout>

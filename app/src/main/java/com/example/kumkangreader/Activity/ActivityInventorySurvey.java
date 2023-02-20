@@ -23,6 +23,7 @@ import com.example.kumkangreader.Adapter.InventoryAdapter;
 import com.example.kumkangreader.Application.ApplicationClass;
 import com.example.kumkangreader.Object.Inventory;
 import com.example.kumkangreader.Object.Users;
+import com.example.kumkangreader.QRCode.QRReaderActivityStockOutMaster;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 import com.google.android.material.textfield.TextInputEditText;
@@ -44,14 +45,15 @@ public class ActivityInventorySurvey extends BaseActivity {
     Spinner spinnerZoneSeqNo;
     TextInputEditText edtNumber;
 
-    public void startProgress() {
-        progressON("Loading...");
-        new Handler().postDelayed(new Runnable() {
+    private void startProgress() {
+        Handler handler = new Handler();
+        handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                progressOFF();
+                progressOFF2();
             }
-        }, 3500);
+        }, 3000);
+        progressON("Loading...", handler);
     }
 
     @Override
@@ -65,9 +67,7 @@ public class ActivityInventorySurvey extends BaseActivity {
         this.imvQR.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                IntentIntegrator intentIntegrator = new IntentIntegrator(ActivityInventorySurvey.this);
-                intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
-                intentIntegrator.initiateScan();
+                ActionQR();
             }
         });
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
@@ -101,17 +101,24 @@ public class ActivityInventorySurvey extends BaseActivity {
         //this.listViewScrap.setAdapter(this.scrapAdapter);
     }
 
+    private void ActionQR(){
+        IntentIntegrator intentIntegrator = new IntentIntegrator(ActivityInventorySurvey.this);
+        intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리
+        intentIntegrator.addExtra("Zone", spinnerZone.getSelectedItem().toString());
+        intentIntegrator.addExtra("ZoneSeqNo", spinnerZoneSeqNo.getSelectedItem().toString());
+        intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
+        intentIntegrator.initiateScan();
+    }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() == null) {
-                Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
+                getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), "", false);
                 //showErrorDialog(this, "취소 되었습니다.",2);
             } else {
-                String scanResult;
-                scanResult = result.getContents();
-                setInventorySurvey(scanResult);
+
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
@@ -125,6 +132,7 @@ public class ActivityInventorySurvey extends BaseActivity {
         values.put("Zone", spinnerZone.getSelectedItem().toString());
         values.put("ZoneSeqNo", spinnerZoneSeqNo.getSelectedItem().toString());
         values.put("UserCode", Users.UserID);
+        values.put("SeqNo", Users.SeqNo);
         SetInventorySurvey gsod = new SetInventorySurvey(url, values, itemTag);
         gsod.execute();
     }
@@ -172,9 +180,8 @@ public class ActivityInventorySurvey extends BaseActivity {
                         Toast.makeText(ActivityInventorySurvey.this, ErrorCheck, Toast.LENGTH_SHORT).show();
                         return;
                     }
-
                 }
-                getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), itemTag);
+                getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), itemTag, false);
                 //showErrorDialog(ActivityInventorySurvey.this, "저장 되었습니다.",1);
                 //Toast.makeText(ActivityInventorySurvey.this, "저장 되었습니다.", Toast.LENGTH_SHORT).show();
 
@@ -316,7 +323,7 @@ public class ActivityInventorySurvey extends BaseActivity {
                 spinnerZoneSeqNo.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                     @Override
                     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                        getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), "");
+                        getInventorySurvey(spinnerZone.getSelectedItem().toString(), spinnerZoneSeqNo.getSelectedItem().toString(), "", false);
                     }
 
                     @Override
@@ -332,12 +339,13 @@ public class ActivityInventorySurvey extends BaseActivity {
         }
     }
 
-    public void getInventorySurvey(String zone, String zoneSeqNo, String itemTag) {
+    public void getInventorySurvey(String zone, String zoneSeqNo, String itemTag, boolean qrFlag) {
         String url = getString(R.string.service_address) + "getInventorySurvey";
         ContentValues values = new ContentValues();
         values.put("Zone", zone);
         values.put("ZoneSeqNo", zoneSeqNo);
-        GetInventorySurvey gsod = new GetInventorySurvey(url, values, itemTag);
+        values.put("SeqNo", Users.SeqNo);
+        GetInventorySurvey gsod = new GetInventorySurvey(url, values, itemTag, qrFlag);
         gsod.execute();
     }
 
@@ -346,18 +354,20 @@ public class ActivityInventorySurvey extends BaseActivity {
         String url;
         ContentValues values;
         String itemTag;
+        boolean qrFlag=false;
 
-        GetInventorySurvey(String url, ContentValues values, String itemTag) {
+        GetInventorySurvey(String url, ContentValues values, String itemTag, boolean qrFlag) {
             this.url = url;
             this.values = values;
             this.itemTag = itemTag;
+            this.qrFlag=qrFlag;
         }
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
-            //startProgress();
+            startProgress();
         }
 
         @Override
@@ -391,7 +401,7 @@ public class ActivityInventorySurvey extends BaseActivity {
                     inventory.ItemTag = child.getString("ItemTag");
                     inventory.PartName = child.getString("PartName");
                     inventory.PartSpecName = child.getString("PartSpecName");
-                    inventory.SeqNo = child.getString("SeqNo");
+                    inventory.RowSeqNo = child.getString("RowSeqNo");
                     inventory.Qty = child.getString("Qty");
                     inventoryArrayList.add(inventory);
                 }
@@ -400,7 +410,7 @@ public class ActivityInventorySurvey extends BaseActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                progressOFF();
+                progressOFF2();
             }
         }
     }
@@ -408,7 +418,7 @@ public class ActivityInventorySurvey extends BaseActivity {
     public Handler mHandler = new Handler() { //다이얼로그 종료시 액티비티 데이터 전송을 위함
         @Override
         public void handleMessage(Message msg) {
-            getInventorySurvey(spinnerZone.getSelectedItem().toString(),spinnerZoneSeqNo.getSelectedItem().toString(), "");
+            getInventorySurvey(spinnerZone.getSelectedItem().toString(),spinnerZoneSeqNo.getSelectedItem().toString(), "", false);
 
         }
     };

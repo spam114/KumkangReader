@@ -17,6 +17,7 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
+import com.example.kumkangreader.Activity.ActivityInventorySurvey;
 import com.example.kumkangreader.Activity.ActivityMoveCoil2;
 import com.example.kumkangreader.Activity.ActivityProductionPerformance;
 import com.example.kumkangreader.Activity.ActivityStockOutNew;
@@ -90,19 +91,24 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         imageView5=findViewById(R.id.imageView5);
         textView7=findViewById(R.id.textView7);//테스트용
 
-        /*if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
+        if(Users.authorityList.contains(0) && Users.SeqNo!=-1){//관리자 권한이 있다면,
             textView7.setText(" 재고조사(클릭)");
         }
 
         textView7.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(Users.authorityList.contains(0)){//관리자 권한이 있다면,
+                if(Users.authorityList.contains(0)&& Users.SeqNo!=-1){//관리자 권한이 있다면,
+
+                    /*if(Users.SeqNo==-1){
+                        Toast.makeText(MainActivity2.this, "등록 가능한 재고 조회 회차가 존재하지 않습니다.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }*/
                     Intent i = new Intent(getBaseContext(), ActivityInventorySurvey.class);
                     startActivity(i);
                 }
             }
-        });*/
+        });
 
         //테스트용
         imageView5.setOnClickListener(new View.OnClickListener() {
@@ -788,6 +794,17 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     @Override
     public void progressOFF() {
         ApplicationClass.getInstance().progressOFF();
+    }
+
+
+    @Override
+    public void progressON(String message, Handler handler) {
+        ApplicationClass.getInstance().progressON(this, message, handler);
+    }
+
+    @Override
+    public void progressOFF2() {
+        ApplicationClass.getInstance().progressOFF2();
     }
 
     @Override

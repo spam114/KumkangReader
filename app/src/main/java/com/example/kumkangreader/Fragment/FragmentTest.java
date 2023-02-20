@@ -2,6 +2,7 @@ package com.example.kumkangreader.Fragment;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Handler;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -49,6 +50,16 @@ public class FragmentTest extends Fragment implements BaseActivityInterface {
     @Override
     public void progressOFF() {
 
+    }
+
+    @Override
+    public void progressON(String message, Handler handler) {
+        ApplicationClass.getInstance().progressON(getActivity(), message, handler);
+    }
+
+    @Override
+    public void progressOFF2() {
+        ApplicationClass.getInstance().progressOFF2();
     }
 
     @Override

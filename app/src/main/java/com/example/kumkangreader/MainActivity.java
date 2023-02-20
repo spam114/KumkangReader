@@ -39,6 +39,7 @@ public class MainActivity extends BaseActivity {
     TextView txtState;
     ArrayList<StockOutDetail> stockOutDetailArrayList;
     ArrayList<StockOutDetail> scanDataArrayList;
+
     private void startProgress() {
         progressON("Loading...");
         new Handler().postDelayed(new Runnable() {
@@ -48,6 +49,7 @@ public class MainActivity extends BaseActivity {
             }
         }, 3500);
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -285,10 +287,6 @@ public class MainActivity extends BaseActivity {
     }*/
 
 
-
-
-
-
     /**
      * 버튼 클릭
      */
@@ -329,16 +327,19 @@ public class MainActivity extends BaseActivity {
     public class SetPrintOrderData extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        SetPrintOrderData(String url, ContentValues values){
+
+        SetPrintOrderData(String url, ContentValues values) {
             this.url = url;
             this.values = values;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등의 행위
             startProgress();
         }
+
         @Override
         protected String doInBackground(Void... params) {
             String result;
@@ -346,6 +347,7 @@ public class MainActivity extends BaseActivity {
             result = requestHttpURLConnection.request(url, values);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
+
         @Override
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
@@ -361,16 +363,15 @@ public class MainActivity extends BaseActivity {
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
                     //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                    showErrorDialog(MainActivity.this, ErrorCheck,2);
+                    showErrorDialog(MainActivity.this, ErrorCheck, 2);
                     return;
                 }
                 //Toast.makeText(getBaseContext(), "출력이 완료 되었습니다.", Toast.LENGTH_SHORT).show();
-                showErrorDialog(MainActivity.this, "출력이 완료 되었습니다.",1);
+                showErrorDialog(MainActivity.this, "출력이 완료 되었습니다.", 1);
 
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 progressOFF();
             }
 
@@ -381,16 +382,19 @@ public class MainActivity extends BaseActivity {
     public class GetStockOutDetailAndScanData extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        GetStockOutDetailAndScanData(String url, ContentValues values){
+
+        GetStockOutDetailAndScanData(String url, ContentValues values) {
             this.url = url;
             this.values = values;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등등의 행위
             startProgress();
         }
+
         @Override
         protected String doInBackground(Void... params) {
             String result;
@@ -398,6 +402,7 @@ public class MainActivity extends BaseActivity {
             result = requestHttpURLConnection.request(url, values);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
+
         @Override
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
@@ -412,7 +417,7 @@ public class MainActivity extends BaseActivity {
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
                         //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                        showErrorDialog(MainActivity.this, ErrorCheck,2);
+                        showErrorDialog(MainActivity.this, ErrorCheck, 2);
                         return;
                     }
                     stockOutDetail = new StockOutDetail(child.getString("PartCode"), child.getString("PartSpec"), child.getString("PartName"),
@@ -433,14 +438,12 @@ public class MainActivity extends BaseActivity {
                 startActivityForResult(i, REQUEST_STOCKOUT);
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 progressOFF();
             }
 
         }
     }
-
 
 
     @Override
@@ -455,14 +458,14 @@ public class MainActivity extends BaseActivity {
         if (result != null) {
             if (result.getContents() == null) {
                 //Toast.makeText(this, "취소 되었습니다.", Toast.LENGTH_LONG).show();
-                showErrorDialog(this, "취소 되었습니다.",1);
+                showErrorDialog(this, "취소 되었습니다.", 1);
             } else {
                 String scanResult;
                 //Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
                 //Intent i = new Intent(getBaseContext(), ActivityStockOut.class);
                 scanResult = result.getContents();
 
-                String url=getString(R.string.service_address) + "getStockOutMaster";
+                String url = getString(R.string.service_address) + "getStockOutMaster";
                 ContentValues values = new ContentValues();
                 values.put("ScanInput", scanResult);
                 GetStockOutMaster gsom = new GetStockOutMaster(url, values);
@@ -477,16 +480,19 @@ public class MainActivity extends BaseActivity {
     public class GetStockOutMaster extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        GetStockOutMaster(String url, ContentValues values){
+
+        GetStockOutMaster(String url, ContentValues values) {
             this.url = url;
             this.values = values;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등의 행위
             startProgress();
         }
+
         @Override
         protected String doInBackground(Void... params) {
             String result;
@@ -494,6 +500,7 @@ public class MainActivity extends BaseActivity {
             result = requestHttpURLConnection.request(url, values);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
+
         @Override
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
@@ -511,7 +518,7 @@ public class MainActivity extends BaseActivity {
                 if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                     ErrorCheck = child.getString("ErrorCheck");
                     //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                    showErrorDialog(MainActivity.this, ErrorCheck,2);
+                    showErrorDialog(MainActivity.this, ErrorCheck, 2);
                     return;
                 }
                 StockOutNo = child.getString("StockOutNo");
@@ -523,7 +530,7 @@ public class MainActivity extends BaseActivity {
                 stockOut.CustomerLocation = CustomerLocation;
                 stockOut.AreaCarNumber = AreaCarNumber;
 
-                String url=getString(R.string.service_address) + "getStockOutDetailAndScanData";
+                String url = getString(R.string.service_address) + "getStockOutDetailAndScanData";
                 ContentValues values = new ContentValues();
                 values.put("ScanInput", StockOutNo);
                 GetStockOutDetailAndScanData gsod = new GetStockOutDetailAndScanData(url, values);
@@ -531,8 +538,7 @@ public class MainActivity extends BaseActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 progressOFF();
             }
 
@@ -542,16 +548,19 @@ public class MainActivity extends BaseActivity {
     public class GetScanData extends AsyncTask<Void, Void, String> {
         String url;
         ContentValues values;
-        GetScanData(String url, ContentValues values){
+
+        GetScanData(String url, ContentValues values) {
             this.url = url;
             this.values = values;
         }
+
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
             //progress bar를 보여주는 등의 행위
             startProgress();
         }
+
         @Override
         protected String doInBackground(Void... params) {
             String result;
@@ -559,6 +568,7 @@ public class MainActivity extends BaseActivity {
             result = requestHttpURLConnection.request(url, values);
             return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
         }
+
         @Override
         protected void onPostExecute(String result) {
             // 통신이 완료되면 호출됩니다.
@@ -574,7 +584,7 @@ public class MainActivity extends BaseActivity {
                     if (!child.getString("ErrorCheck").equals("null")) {//문제가 있을 시, 에러 메시지 호출 후 종료
                         ErrorCheck = child.getString("ErrorCheck");
                         //Toast.makeText(getBaseContext(), ErrorCheck, Toast.LENGTH_SHORT).show();
-                        showErrorDialog(MainActivity.this, ErrorCheck,2);
+                        showErrorDialog(MainActivity.this, ErrorCheck, 2);
                         return;
                     }
                     stockOutDetail = new StockOutDetail(child.getString("PartCode"), child.getString("PartSpec"),
@@ -592,8 +602,7 @@ public class MainActivity extends BaseActivity {
 
             } catch (Exception e) {
                 e.printStackTrace();
-            }
-            finally {
+            } finally {
                 progressOFF();
             }
 
@@ -664,7 +673,7 @@ public class MainActivity extends BaseActivity {
                     String item = (String) msg.obj;
                     if (task_info.get(0).topActivity.getClassName().equals("com.example.kumkangreader.MainActivity")) {
 
-                        String url=getString(R.string.service_address) + "getStockOutMaster";
+                        String url = getString(R.string.service_address) + "getStockOutMaster";
                         ContentValues values = new ContentValues();
                         values.put("ScanInput", item);
                         GetStockOutMaster gsom = new GetStockOutMaster(url, values);

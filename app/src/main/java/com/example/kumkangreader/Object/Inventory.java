@@ -5,7 +5,7 @@ import java.io.Serializable;
 public class Inventory implements Serializable {
 
     public String ItemTag = "";
-    public String SeqNo="";
+    public String RowSeqNo="";
     public String PartName="";
     public String PartSpecName="";
     public String Qty="";

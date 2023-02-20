@@ -99,6 +99,16 @@ public class ViewStockOutAdapter extends ArrayAdapter<ViewData> implements BaseA
     }
 
     @Override
+    public void progressON(String message, Handler handler) {
+        ApplicationClass.getInstance().progressON((Activity)context, message, handler);
+    }
+
+    @Override
+    public void progressOFF2() {
+        ApplicationClass.getInstance().progressOFF2();
+    }
+
+    @Override
     public void showErrorDialog(Context context, String message, int type) {
         ApplicationClass.getInstance().showErrorDialog(context, message, type);
     }

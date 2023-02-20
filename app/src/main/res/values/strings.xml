@@ -4,7 +4,7 @@
     <string name="qr_state_coil_input">코일태그를 인식해주세요.</string>
     <string name="qr_state_production">발주서태그를 인식해주세요.</string>
     <string name="qr_state_normal">태그를 인식해주세요.</string>
-    <!--4445 테스트-->
+    <!--3333 본디비, 4445 테스트-->
     <!--<string name="service_address">http://211.245.239.53:4445/Service/json/</string>-->
     <string name="service_address">http://211.245.239.53:3333/Service/json/</string>
     <string name="app_code">4</string>

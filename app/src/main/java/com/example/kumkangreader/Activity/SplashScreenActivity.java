@@ -66,7 +66,6 @@ public class SplashScreenActivity extends BaseActivity {
     private boolean mIsOpened = false;
     private int mBarcodeHandle = -1;
     //pda스캐너변수 끝
-
     /*
     버전다운로드 관련 변수
      */
@@ -504,7 +503,6 @@ public class SplashScreenActivity extends BaseActivity {
                     showErrorDialog(SplashScreenActivity.this, "사용자 혹은 권한이 등록되어있지 않습니다.",2);
                     Intent Intent = new Intent(SplashScreenActivity.this, LoginActivity.class);
                     startActivity(Intent);
-                    return;
                 } else {
                     for (int i = 0; i < jsonArray.length(); i++) {
                         JSONObject child = jsonArray.getJSONObject(i);
@@ -520,10 +518,7 @@ public class SplashScreenActivity extends BaseActivity {
                         Users.authorityNameList.add(child.getString("AuthorityName"));
                     }
                     Intent Intent = new Intent(SplashScreenActivity.this, MainActivity2.class);
-
                     getWorkClassCode(Intent);
-                    return;
-
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -533,6 +528,9 @@ public class SplashScreenActivity extends BaseActivity {
         }
     }
 
+    /**
+     * 작업조 + 재고조사 회차SeqNo를 가져온다.
+     * **/
     private void getWorkClassCode(Intent intent) {
         String url = getString(R.string.service_address) + "getWorkClassCode";
         ContentValues values = new ContentValues();
@@ -589,6 +587,7 @@ public class SplashScreenActivity extends BaseActivity {
                     WorkClass workClass=new WorkClass();
                     workClass.WorkClassCode = child.getString("WorkClassCode");
                     workClass.WorkClassName = child.getString("WorkClassName");
+                    Users.SeqNo = Integer.parseInt(child.getString("SeqNo"));
                     workClassSequences[i]=child.getString("WorkClassName");
                     workClassArrayList.add(workClass);
                 }

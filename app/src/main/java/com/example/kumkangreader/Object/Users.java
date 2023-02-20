@@ -33,6 +33,8 @@ public class Users {
     public static String WorkClassCode = "A";
     public static String WorkClassName = "주간";
 
+    public static int SeqNo=-1;//재고조사 회차 순번
+
     //true면 비가동상태
     //public static boolean CostCenterStopOperationStatus=true;
 }
