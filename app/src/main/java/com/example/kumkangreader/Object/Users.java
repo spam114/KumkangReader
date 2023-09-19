@@ -1,5 +1,5 @@
 package com.example.kumkangreader.Object;
-
+import com.example.kumkangreader.SoundManager;
 import java.util.List;
 
 public class Users {
@@ -34,7 +34,7 @@ public class Users {
     public static String WorkClassName = "주간";
 
     public static int SeqNo=-1;//재고조사 회차 순번
-
+    public static SoundManager SoundManager;
     //true면 비가동상태
     //public static boolean CostCenterStopOperationStatus=true;
 }

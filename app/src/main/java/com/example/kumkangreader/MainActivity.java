@@ -9,8 +9,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
 
 import com.example.kumkangreader.Activity.ActivityStockOut;
 import com.example.kumkangreader.Activity.BaseActivity;
@@ -35,8 +33,8 @@ public class MainActivity extends BaseActivity {
     private final int REQUEST_STOCKOUT = 1;
     static int connectedScannerID;
     public StockOut stockOut;
-    Button btnCamera;
-    TextView txtState;
+    //Button btnCamera;
+    //TextView txtState;
     ArrayList<StockOutDetail> stockOutDetailArrayList;
     ArrayList<StockOutDetail> scanDataArrayList;
 
@@ -54,8 +52,6 @@ public class MainActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.layout1);
-        this.btnCamera = findViewById(R.id.btnCamera);
-        this.txtState = findViewById(R.id.txtState);
         /*this.txtVersion=findViewById(R.id.txtVersion);*/
         this.stockOutDetailArrayList = new ArrayList<>();
         this.scanDataArrayList = new ArrayList<>();

@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatDialog;
 
+import com.example.kumkangreader.Object.Users;
 import com.example.kumkangreader.R;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
@@ -144,12 +145,12 @@ public class ApplicationClass extends Application {
         MaterialAlertDialogBuilder alertBuilder= new MaterialAlertDialogBuilder(context, R.style.Body_ThemeOverlay_MaterialComponents_MaterialAlertDialog);
         if(type==1){
             alertBuilder.setTitle("작업 성공");
+            Users.SoundManager.playSound(0, 0, 3);
         }
         else{
             alertBuilder.setTitle("에러 발생");
+            Users.SoundManager.playSound(0, 2, 3);//에러
         }
-
-
         alertBuilder.setMessage(message);
         alertBuilder.setPositiveButton("확인", new DialogInterface.OnClickListener() {
             @Override

@@ -40,6 +40,7 @@ import com.example.kumkangreader.Object.WorkClass;
 import com.example.kumkangreader.PreferenceManager;
 import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
+import com.example.kumkangreader.SoundManager;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import org.json.JSONArray;
@@ -113,7 +114,7 @@ public class SplashScreenActivity extends BaseActivity {
 
 
         Users.ScreenInches=(float)( getScreenInches());
-
+        Users.SoundManager = new SoundManager(this);
         /* New Handler to start the Menu-Activity
          * and close this Splash-Screen after some seconds.*/
         /* Duration of wait */

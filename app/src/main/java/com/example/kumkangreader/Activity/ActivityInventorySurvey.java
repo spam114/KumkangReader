@@ -101,6 +101,17 @@ public class ActivityInventorySurvey extends BaseActivity {
         //this.listViewScrap.setAdapter(this.scrapAdapter);
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                imvQR.performClick();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
     private void ActionQR(){
         IntentIntegrator intentIntegrator = new IntentIntegrator(ActivityInventorySurvey.this);
         intentIntegrator.setBeepEnabled(true);//바코드 인식시 소리

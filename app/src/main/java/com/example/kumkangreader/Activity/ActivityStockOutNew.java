@@ -491,7 +491,16 @@ public class ActivityStockOutNew extends BaseActivity{
 
         }
     }
-
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                imvQR.performClick();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
 
    /* public class GetStockOutDetailAndScanData extends AsyncTask<Void, Void, String> {
         String url;

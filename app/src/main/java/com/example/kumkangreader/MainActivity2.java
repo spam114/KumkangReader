@@ -8,6 +8,7 @@ import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
@@ -341,6 +342,17 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
                 intentIntegrator.initiateScan();
             }
         });
+    }
+
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        switch (keyCode){
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                imvQR.performClick();
+                return true;
+        }
+        return super.onKeyDown(keyCode, event);
     }
 
     @Override
