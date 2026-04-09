@@ -4,17 +4,22 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
@@ -43,6 +48,8 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import missing.namespace.R;
+
 public class MainActivity2 extends FragmentActivity implements BaseActivityInterface {
     TabLayout tabs;
     //TabLayout tabs2;
@@ -57,6 +64,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     /*Fragment3 fragment3;*/
     ImageView imvQR;
     BackPressControl backpressed;
+    String noticeData;
 
     private final int REQUEST_STOCKOUT = 1;
     private final int REQUEST_COIL_INPUT = 2;
@@ -72,7 +80,7 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
     TabLayout.Tab fourthTab;
 
     TextView textView7;
-
+    SharedPreferences noticePref;//공지 유무를 저장
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +99,13 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
         tabs = findViewById(R.id.tabs);
         imageView5=findViewById(R.id.imageView5);
         textView7=findViewById(R.id.textView7);//테스트용
+        noticePref = getSharedPreferences("NoticePref", MODE_PRIVATE);
+        boolean viewNotice = true;
+        viewNotice = noticePref.getBoolean("viewNotice", true);
+
+        if (viewNotice == true) {
+            getNoticeData();
+        }
 
         if(Users.authorityList.contains(0) && Users.SeqNo!=-1){//관리자 권한이 있다면,
             textView7.setText(" 재고조사(클릭)");
@@ -340,6 +355,102 @@ public class MainActivity2 extends FragmentActivity implements BaseActivityInter
 
                 // intentIntegrator.setCaptureActivity(QRReaderActivityStockOutMaster.class);
                 intentIntegrator.initiateScan();
+            }
+        });
+    }
+
+    private void getNoticeData() {
+        String url = getString(R.string.service_address) + "getNoticeData";
+        ContentValues values = new ContentValues();
+        values.put("AppCode", getString(R.string.app_code));
+        GetNoticeData gsod = new GetNoticeData(url, values);
+        gsod.execute();
+    }
+
+    public class GetNoticeData extends AsyncTask<Void, Void, String> {
+        String url;
+        ContentValues values;
+
+        GetNoticeData(String url, ContentValues values) {
+            this.url = url;
+            this.values = values;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            //startProgress();
+            //progress bar를 보여주는 등등의 행위
+        }
+
+        @Override
+        protected String doInBackground(Void... params) {
+            String result;
+            RequestHttpURLConnection requestHttpURLConnection = new RequestHttpURLConnection();
+            result = requestHttpURLConnection.request(url, values);
+            return result; // 결과가 여기에 담깁니다. 아래 onPostExecute()의 파라미터로 전달됩니다.
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            // 통신이 완료되면 호출됩니다.
+            // 결과에 따른 UI 수정 등은 여기서 합니다
+            try {
+                //WoImage image;
+                JSONArray jsonArray = new JSONArray(result);
+                String ErrorCheck = "";
+                //stockArrayList = new ArrayList<>();
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject child = jsonArray.getJSONObject(i);
+                    noticeData = child.getString("AppRemark");
+                }
+                viewNotice();
+            } catch (Exception e) {
+
+            } finally {
+                //progressOFF2(this.getClass().getName());
+            }
+        }
+    }
+
+    private void viewNotice() {
+
+        LayoutInflater inflater = getLayoutInflater();
+        final View dialogView = inflater.inflate(R.layout.dialog_notice, null);
+        AlertDialog.Builder buider = new AlertDialog.Builder(this); //AlertDialog.Builder 객체 생성
+        //  buider.setIcon(android.R.drawable.ic_menu_add); //제목옆의 아이콘 이미지(원하는 이미지 설정)
+        buider.setView(dialogView); //위에서 inflater가 만든 dialogView 객체 세팅 (Customize)
+
+        TextView tvTitle = dialogView.findViewById(R.id.tvTitle);
+        try {
+            tvTitle.setText("변경사항(version " + getBaseContext().getPackageManager().getPackageInfo(getBaseContext().getPackageName(), 0).versionName + ")");
+        } catch (PackageManager.NameNotFoundException e) {
+            tvTitle.setText("변경사항");
+        }
+
+
+        TextView tvContent = dialogView.findViewById(R.id.tvContent);
+        tvContent.setText(noticeData);
+
+        final AlertDialog dialog = buider.create();
+        //Dialog의 바깥쪽을 터치했을 때 Dialog를 없앨지 설정
+        dialog.setCanceledOnTouchOutside(false);//없어지지 않도록 설정
+        //Dialog 보이기
+
+        dialog.show();
+
+        Button btnOK = dialogView.findViewById(R.id.btnOK);
+        btnOK.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CheckBox chkNoView = dialogView.findViewById(R.id.chkNoView);
+
+                if (chkNoView.isChecked()) {
+                    SharedPreferences.Editor editor = noticePref.edit();
+                    editor.putBoolean("viewNotice", false);
+                    editor.commit();
+                }
+                dialog.dismiss();
             }
         });
     }

@@ -20,7 +20,6 @@ import com.example.kumkangreader.Adapter.StockOutDetailAdapter;
 import com.example.kumkangreader.Object.StockOut;
 import com.example.kumkangreader.Object.StockOutDetail;
 import com.example.kumkangreader.Object.Users;
-import com.example.kumkangreader.R;
 import com.example.kumkangreader.RequestHttpURLConnection;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.zxing.integration.android.IntentIntegrator;
@@ -30,6 +29,8 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+
+import missing.namespace.R;
 
 /**
  * 신규 출고시스템 20210517

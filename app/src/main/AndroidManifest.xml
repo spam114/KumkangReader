@@ -135,7 +135,7 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
-        <!--<receiver
+        <receiver
 
             android:name=".Receiver.StartupReceiver"
             android:enabled="true"
@@ -143,6 +143,6 @@
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED"/>
             </intent-filter>
-        </receiver>-->
+        </receiver>
     </application>
 </manifest>
